@@ -1,5 +1,6 @@
 export type SkillDomain = 'technical' | 'risk' | 'context' | 'crypto' | 'human' | 'cognitive';
 export type EpochId = 'street' | 'cabinet' | 'terminal' | 'system';
+export type SkinId = 'terminal' | 'field-notes' | 'neon-district';
 export type SourceId = 'chart' | 'news' | 'position' | 'wallet' | 'tokenomics' | 'onchain' | 'orderbook' | 'sentiment';
 export type EvidenceId = string;
 
@@ -90,6 +91,8 @@ export interface GameProgress {
   combosUnlocked: string[];
   calibration: { predicted: number; actual: number }[];
   weather: string;
+  activeSkin: SkinId;
+  ownedSkins: SkinId[];
 }
 export interface ErrorScrollEntry {
   id: string;

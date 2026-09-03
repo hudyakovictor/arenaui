@@ -33,8 +33,8 @@ export const templates: EncounterTemplate[] = [
       'Твой риск — 1% депозита. Где размер позиции?'
     ],
     answers:[
-      {label:'A', text:'Риск 40, размер — до стопа 2%: плечо не нужно', errorType:''},
-      {label:'B', text:'Риск 20 — экономлю', errorType:'under-risk'},
+      {label:'A', text:'Риск 20; при стопе 2% размер позиции — 1 000', errorType:''},
+      {label:'B', text:'Риск 10 — беру половину лимита без причины', errorType:'under-risk'},
       {label:'C', text:'Ставлю 10% депозита — сигнал надёжный', errorType:'oversize', enemyHint:'E04'},
       {label:'D', text:'Ждать — рынок сомнительный', isWait:true, errorType:'PaperHands'},
     ],
@@ -145,6 +145,27 @@ export const templates: EncounterTemplate[] = [
       {id:'ev-sent', source:'sentiment', label:'Эйфория 92 — пик', isCorrect:true},
     ],
     skills:['C2','C6','C11'],
+  },
+  {
+    id:'T-SYSTEM', learningGoal:'Собрать полный порядок анализа и отказаться от лишнего действия', atoms:['C16.2','C2.6','C10.1','C4.2'], enemyId:'E33', stage:4, domain:'cognitive',
+    sources:['chart','orderbook','position'],
+    questionPool:[
+      'Режим сменился, структура спорная, OI растёт. Собери порядок проверки перед решением.',
+      'Сигналы конфликтуют. В каком порядке система проверяет контекст, структуру, деривативы и риск?'
+    ],
+    answers:[
+      {label:'A', text:'Следовать системному порядку проверки', errorType:''},
+      {label:'B', text:'Начать с плеча и подогнать риск', errorType:'Leverage', enemyHint:'E04'},
+      {label:'C', text:'Довериться одному индикатору', errorType:'IndicatorCult', enemyHint:'E03'},
+      {label:'D', text:'Пропустить контекст старшего таймфрейма', errorType:'context-skip', enemyHint:'E33'},
+    ],
+    correct:0,
+    evidence:[
+      {id:'ev-system-structure', source:'chart', label:'Структура старшего ТФ: граница режима ещё не подтверждена', isCorrect:true},
+      {id:'ev-system-oi', source:'orderbook', label:'OI растёт, но спотовый объём не поддерживает движение', isCorrect:true},
+      {id:'ev-system-risk', source:'position', label:'Текущий суммарный риск уже 2.4%', isCorrect:false},
+    ],
+    skills:['C16','C2','C10','C4'],
   },
 ];
 
