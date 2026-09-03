@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { gameState } from '../state/GameState';
 import { epochOf } from '../config/epochConfig';
+import { skinById } from '../config/skinConfig';
 
 export class BootScene extends Phaser.Scene {
   constructor(){ super({ key: 'BootScene' }); }
@@ -19,9 +20,10 @@ export class BootScene extends Phaser.Scene {
 
     // короткая заставка эпохи — токены меняются без новой сцены (ТЗ Часть 2 §4)
     const ep = epochOf(p.level);
-    this.cameras.main.setBackgroundColor(ep.tokens.bg);
+    const skin = skinById[p.activeSkin] ?? skinById.terminal;
+    this.cameras.main.setBackgroundColor(skin.id==='terminal' ? ep.tokens.bg : skin.palette.bg);
     const title = this.add.text(195, 340, 'SIGNAL ARENA', { fontFamily:'Inter, system-ui, sans-serif', fontSize:'22px', color:'#E9F2FF', fontStyle:'italic' }).setOrigin(0.5);
-    const sub = this.add.text(195, 372, `${ep.name} · УРОВЕНЬ ${p.level}`, { fontFamily:'IBM Plex Mono, monospace', fontSize:'10px', color:ep.tokens.accent }).setOrigin(0.5);
+    const sub = this.add.text(195, 372, `${ep.name} · УРОВЕНЬ ${p.level}`, { fontFamily:'IBM Plex Mono, monospace', fontSize:'10px', color:'#'+skin.palette.accent.toString(16).padStart(6,'0') }).setOrigin(0.5);
     const motto = this.add.text(195, 400, ep.motto, { fontFamily:'Inter, sans-serif', fontSize:'10px', color:'#93A3BC', align:'center', wordWrap:{width:300}}).setOrigin(0.5);
     this.add.text(195, 520, 'КОШЕЛЁК — НЕ ТЕРМИНАЛ. ТЕРМИНАЛ — НЕ КАЗИНО.', { fontFamily:'IBM Plex Mono, monospace', fontSize:'8px', color:'#62708A'}).setOrigin(0.5);
     this.time.delayedCall(900, ()=> this.scene.start('ArenaScene'));

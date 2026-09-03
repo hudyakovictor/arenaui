@@ -25,9 +25,9 @@ export function mutate(template: EncounterTemplate, seed: number): EncounterInst
     // мутация чисел: объём, риск
     let label = ev.label;
     if(label.includes('2.1K')) label = label.replace('2.1K', `${(rng.int(12,38)/10).toFixed(1)}K`);
-    if(label.includes('40%')) label = `${rng.int(30,55)}%`;
-    if(label.includes('2000')) label = label.replace('2000', String(rng.int(1500,3500)));
-    if(label.includes('20')) label = label.replace('20', String(rng.int(15,30)));
+    if(label.includes('40%')) label = label.replace('40%', `${rng.int(30,55)}%`);
+    // Денежные значения не меняем независимо от вопроса: иначе калькулятор
+    // начинает противоречить условию. Числовой контекст должен мутировать атомарно.
     return { ...ev, label };
   });
   // в эпохах III–IV добавляется шум — лишний источник (не влияет на вердикт)

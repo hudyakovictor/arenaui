@@ -3,6 +3,7 @@ import { gameState } from '../state/GameState';
 import { cards } from '../data/cards';
 import { enemies, enemyById } from '../data/enemies';
 import { epochOf } from '../config/epochConfig';
+import { skinById } from '../config/skinConfig';
 
 const COLORS={ bg:0x070B14, surface:0x0C1323, elevated:0x111B2E, border:0x22304A, cyan:0x31D6C4, good:0x3BDE8A, bad:0xFF596D, muted:0x62708A, strong:0x344563, text:0xE9F2FF };
 
@@ -13,7 +14,9 @@ export class CollectionScene extends Phaser.Scene {
   create(): void {
     const p=gameState.progress;
     const ep=epochOf(p.level);
-    this.cameras.main.setBackgroundColor(ep.tokens.bg as any);
+    const skin=skinById[p.activeSkin] ?? skinById.terminal;
+    Object.assign(COLORS,{bg:skin.palette.bg,surface:skin.palette.surface,elevated:skin.palette.elevated,border:skin.palette.border,cyan:skin.palette.accent,muted:skin.palette.muted,strong:skin.palette.strong,text:skin.palette.text});
+    this.cameras.main.setBackgroundColor(skin.id==='terminal'?ep.tokens.bg:skin.palette.bg);
     this.add.text(14,14,'Коллекция', { fontFamily:'Inter, sans-serif', fontSize:'22px', color:'#E9F2FF'});
     this.add.text(14,40, `${cards.filter(c=> gameState.isCardUnlocked(c.id)).length} КАРТ · ${Object.keys(p.enemyStagesReached).length} ТРОФЕЕВ · КОМБО ${p.combosUnlocked.length}`, { fontFamily:'IBM Plex Mono, monospace', fontSize:'9px', color:'#62708A'});
     this.add.text(14,52,'трофей эволюционирует слоями S1→S4, дубликатов нет', { fontFamily:'IBM Plex Mono, monospace', fontSize:'7px', color:'#62708A'});
@@ -111,7 +114,7 @@ export class CollectionScene extends Phaser.Scene {
       {label:'ACADEMY', go:'AcademyScene'},
       {label:'ARENA', go:'ArenaScene'},
       {label:'COLLECTION', active:true},
-      {label:'MORE'},
+      {label:'MORE', go:'MoreScene'},
     ] as any[];
     items.forEach((it,i)=>{
       const nx=i*(390/4);

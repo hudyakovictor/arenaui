@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { gameState } from '../state/GameState';
 import { cards } from '../data/cards';
 import { epochOf } from '../config/epochConfig';
+import { skinById } from '../config/skinConfig';
 
 // Академия — теория, без врагов и без заданий Арены (ТЗ Часть 1 §4.3)
 // Единственное допустимое присутствие врага — тизер-силуэт на обложке главы
@@ -12,7 +13,9 @@ export class AcademyScene extends Phaser.Scene {
   create(): void {
     const p=gameState.progress;
     const ep=epochOf(p.level);
-    this.cameras.main.setBackgroundColor(ep.tokens.bg as any);
+    const skin=skinById[p.activeSkin] ?? skinById.terminal;
+    Object.assign(COLORS,{bg:skin.palette.bg,surface:skin.palette.surface,elevated:skin.palette.elevated,border:skin.palette.border,cyan:skin.palette.accent,muted:skin.palette.muted,sub:skin.palette.sub,text:skin.palette.text,paper:skin.palette.paper});
+    this.cameras.main.setBackgroundColor(skin.id==='terminal'?ep.tokens.bg:skin.palette.bg);
 
     this.add.text(14,14,'Академия', { fontFamily:'Inter, system-ui, sans-serif', fontSize:'22px', color:'#E9F2FF'});
     this.add.text(14,40,`КУРС 17 ГЛАВ · ${p.level>=78?'ВСЕ КАРТЫ ОТКРЫТЫ':'L${p.level} · '+ep.name}`, { fontFamily:'IBM Plex Mono, monospace', fontSize:'9px', color:'#62708A'});
@@ -121,7 +124,7 @@ export class AcademyScene extends Phaser.Scene {
       {label:'ACADEMY', active:true},
       {label:'ARENA', active:false, go:'ArenaScene'},
       {label:'COLLECTION', active:false, go:'CollectionScene'},
-      {label:'MORE', active:false},
+      {label:'MORE', active:false, go:'MoreScene'},
     ] as any[];
     items.forEach((it,i)=>{
       const nx=i*(390/4);
