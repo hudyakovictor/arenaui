@@ -3,6 +3,7 @@ import { getEpochForLevel } from '../config/epochConfig';
 import type { GameProgress } from '../types';
 
 const STORAGE_KEY = 'arena_v4_progress';
+const FLAGS_KEY = 'arena_v4_flags';
 
 function defaultProgress(): GameProgress {
   return {
@@ -60,6 +61,25 @@ export class GameState {
     const lvl = this.progress.level;
     const map: Record<string,number> = {C1:1,C2:4,C3:8,C4:12,C5:16,C8:21,C7:26,C6:31,C9:36,C10:41,C11:46,C12:51,C13:56,C14:61,C15:66,C16:72,C17:78};
     return lvl >= (map[cardId]??99);
+  }
+  // ── флаги юзерфлоу (онбординг, разминка дня, переход эпохи и т.д.) ──
+  getFlag(key:string): boolean {
+    let f: Record<string, boolean> = {};
+    try { f = JSON.parse(localStorage.getItem(FLAGS_KEY) ?? '{}'); } catch {}
+    return !!f[key];
+  }
+  setFlag(key:string, val:boolean = true): void {
+    let f: Record<string, boolean> = {};
+    try { f = JSON.parse(localStorage.getItem(FLAGS_KEY) ?? '{}'); } catch {}
+    f[key]=val;
+    try { localStorage.setItem(FLAGS_KEY, JSON.stringify(f)); } catch {}
+  }
+  // сброс для демо: вернуть флаги и прогресс к первому входу
+  resetAll(): void {
+    try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(FLAGS_KEY); } catch {}
+    this.progress = defaultProgress();
+    this.refreshEpoch();
+    this.save();
   }
 }
 

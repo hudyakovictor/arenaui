@@ -121,7 +121,7 @@ export class AcademyScene extends Phaser.Scene {
       {label:'ACADEMY', active:true},
       {label:'ARENA', active:false, go:'ArenaScene'},
       {label:'COLLECTION', active:false, go:'CollectionScene'},
-      {label:'MORE', active:false},
+      {label:'MORE', active:false, go:'MoreScene'},
     ] as any[];
     items.forEach((it,i)=>{
       const nx=i*(390/4);

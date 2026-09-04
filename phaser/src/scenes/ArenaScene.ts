@@ -2,12 +2,13 @@ import Phaser from 'phaser';
 import { gameState } from '../state/GameState';
 import { balanceConfig } from '../config/balanceConfig';
 import { epochOf, getEpochForLevel } from '../config/epochConfig';
-import { templates } from '../data/templates';
+import { templateFor } from '../data/templates';
 import { mutate } from '../engine/mutator';
 import { scoreEncounter } from '../engine/scoring';
 import { enemies, enemyById } from '../data/enemies';
 import { cards, cardById } from '../data/cards';
 import { sourceById } from '../data/sources';
+import { enemyAvatarKey, cardKey } from '../engine/assetKeys';
 import type { EncounterInstance, Confidence, SourceId } from '../types';
 
 // Токены — Terminal Design System, меняются эпохой без новой сцены (ТЗ Часть 2 §4)
@@ -62,21 +63,30 @@ export class ArenaScene extends Phaser.Scene {
   }
 
   private pickTemplate(){
-    // приоритет: свиток ошибок (M7) → следующая стадия кампании → ротация
+    // приоритет: свиток ошибок (M7) → ближайшая стадия кампании (M12) → ротация.
+    // templateFor() сам синтезирует шаблон для ЛЮБОГО врага/стадии — весь ростер 33 врагов проходим.
     if(this.progress.errorScroll.length>0 && !this.progress.errorScroll[0].closed){
       const e = this.progress.errorScroll[0];
-      const byEnemy = templates.find(t=> t.enemyId===e.enemy);
-      if(byEnemy) return byEnemy;
+      const enemy = enemyById[e.enemy];
+      const stageNum = enemy?.stages.find(s=>s.level<=this.progress.level)?.stage ?? enemy?.stages[0].stage ?? 1;
+      return templateFor(e.enemy, stageNum);
     }
-    // ближайший враг по уровню
+    // ближайшая доступная стадия по уровню
     const lvl = this.progress.level;
-    const cand = templates.filter(t=>{
-      const st = enemyById[t.enemyId]?.stages.find(s=>s.stage===t.stage);
-      return st && lvl >= st.level -2 && lvl <= st.level+8;
-    });
-    if(cand.length) return cand[0];
-    // иначе ротация по уровню
-    return templates[lvl % templates.length];
+    let best: { enemyId:string; stageNum:number; dist:number } | null = null;
+    for(const en of enemies){
+      for(const s of en.stages){
+        if(lvl >= s.level - 6 && lvl <= s.level + 6){
+          const dist = Math.abs(lvl - s.level);
+          if(!best || dist < best.dist) best = { enemyId: en.id, stageNum: s.stage, dist };
+        }
+      }
+    }
+    if(best) return templateFor(best.enemyId, best.stageNum);
+    // ротация по уровню
+    const cand = enemies[lvl % enemies.length];
+    const st = cand.stages.find(s=>s.level<=lvl)?.stage ?? cand.stages[0].stage;
+    return templateFor(cand.id, st);
   }
 
   private createTopBar(): void {
@@ -374,8 +384,17 @@ export class ArenaScene extends Phaser.Scene {
         }
       });
       const iconCol = !unlocked ? '#62708A' : (s as any).rank>=2 ? '#3BDE8A' : '#31D6C4';
-      this.add.text(sx+cardW/2, sy+14, s.icon, { fontSize:'14px', color: iconCol}).setOrigin(0.5);
-      this.add.text(sx+cardW/2, sy+30, s.name, { ...FONT_MONO, fontSize:'7px', color: unlocked?'#93A3BC':'#62708A'}).setOrigin(0.5);
+      // мини-арт карты (SVG-текстура) вместо ASCII-иконки
+      const ck = cardKey(s.id);
+      if(this.textures.exists(ck)){
+        const img = this.add.image(sx+cardW/2, sy+16, ck).setDisplaySize(16,24);
+        if(!unlocked) img.setTint(0x62708A);
+        else if((s as any).rank>=2) img.setTint(0x9BEBB0);
+        else img.setTint(0x9DE8E2);
+      } else {
+        this.add.text(sx+cardW/2, sy+14, s.icon, { fontSize:'14px', color: iconCol}).setOrigin(0.5);
+      }
+      this.add.text(sx+cardW/2, sy+32, s.name, { ...FONT_MONO, fontSize:'7px', color: unlocked?'#93A3BC':'#62708A'}).setOrigin(0.5);
       if(s.id!=='Cwait'){
         const r = (s as any).rank;
         const rankLabel = r===0?'r1': r===1?'r1': r>=2?'r'+(r+1):'r1';
@@ -619,8 +638,14 @@ export class ArenaScene extends Phaser.Scene {
       });
       this.add.text(cx+w/2, cy+22, e.name.split(' ')[0], { ...FONT_MONO, fontSize:'7px', color:'#E9F2FF'}).setOrigin(0.5);
       this.add.text(cx+w/2, cy+34, e.id, { ...FONT_MONO, fontSize:'7px', color:'#62708A'}).setOrigin(0.5);
-      this.add.circle(cx+w/2, cy+50, 10, 0x060A12).setStrokeStyle(1, COLORS.strong);
-      this.add.text(cx+w/2, cy+50, '?', { ...FONT_MONO, fontSize:'10px', color:'#B783FF'}).setOrigin(0.5);
+      // портрет-заглушка (SVG-аватар, одинаковый палитрой по домену — стилистически близкие)
+      this.add.circle(cx+w/2, cy+50, 11, 0x060A12).setStrokeStyle(1, COLORS.strong);
+      const avKey = enemyAvatarKey(e.id);
+      if(this.textures.exists(avKey)){
+        this.add.image(cx+w/2, cy+50, avKey).setDisplaySize(26,26).setAlpha(0.9);
+      } else {
+        this.add.text(cx+w/2, cy+50, '?', { ...FONT_MONO, fontSize:'10px', color:'#B783FF'}).setOrigin(0.5);
+      }
     });
     this.add.text(195, y+98, 'тапни портрет — после ответа', { ...FONT_MONO, fontSize:'7px', color:'#62708A'}).setOrigin(0.5);
   }
@@ -698,13 +723,14 @@ export class ArenaScene extends Phaser.Scene {
     // всегда 4 зоны по контракту, но в Улице 2 активны — остальные locked как ось взросления
     const all = ['ACADEMY','ARENA','COLLECTION','MORE'];
     all.forEach((label,i)=>{
-      const unlocked = nav.includes(label);
+      const unlocked = nav.includes(label) || (label==='MORE' && (nav.includes('TOURNAMENTS') || nav.includes('MARKET')));
       const isActive = label==='ARENA';
       const nx=i*(390/4);
       this.add.rectangle(nx, 784, 390/4, 60, unlocked? COLORS.elevated: COLORS.inset).setStrokeStyle(1, COLORS.border).setOrigin(0).setInteractive().on('pointerdown', ()=>{
         if(!unlocked){ this.cameras.main.flash(60,255,179,65); return; }
         if(label==='ACADEMY') this.scene.start('AcademyScene');
         if(label==='COLLECTION') this.scene.start('CollectionScene');
+        if(label==='MORE') this.scene.start('MoreScene');
       });
       this.add.text(nx+390/8, 810, label, { ...FONT_MONO, fontSize:'7px', color: isActive? '#31D6C4' : unlocked?'#93A3BC':'#46536A'}).setOrigin(0.5);
       if(!unlocked) this.add.text(nx+390/8,822,'SOON', { ...FONT_MONO, fontSize:'6px', color:'#62708A'}).setOrigin(0.5);
