@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Signal Arena — v2 бетон + терминал</title>
+  <style>
+    :root { --lime:#C6FF00; --bg:#0a0b0d; --ink:#E9F2FF; --muted:#8A9488; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: var(--bg); color: var(--ink); font-family: Inter, system-ui, sans-serif; }
+    body { display: grid; grid-template-rows: auto 1fr auto; min-height: 100dvh; }
+    header, footer { padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
+    header { border-bottom: 1px solid #222; }
+    footer { border-top: 1px solid #222; justify-content: space-between; }
+    .brand { font-weight: 800; letter-spacing: .08em; color: var(--lime); text-transform: uppercase; font-size: 12px; }
+    .step { font: 700 12px/1 ui-monospace, monospace; color: var(--muted); }
+    .caption { font: 12px/1.4 Inter, sans-serif; }
+    .caption small { display: block; color: var(--muted); margin-top: 2px; }
+    main { display: grid; place-items: center; padding: 12px; overflow: auto; }
+    img { max-height: calc(100dvh - 140px); max-width: min(420px, 100%); border-radius: 12px; box-shadow: 0 20px 60px #000; }
+    button { appearance: none; border: 0; background: var(--lime); color: #111; font-weight: 800; min-height: 44px; padding: 0 18px; border-radius: 10px; cursor: pointer; }
+    button.ghost { background: transparent; color: var(--muted); border: 1px solid #333; }
+    button:disabled { opacity: .35; }
+    .dots { display: flex; gap: 6px; }
+    .dots i { width: 8px; height: 8px; border-radius: 99px; background: #333; }
+    .dots i.on { background: var(--lime); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">Signal Arena v2</div>
+    <div class="step" id="step"></div>
+    <div class="caption" id="cap"></div>
+  </header>
+  <main><img id="frame" alt="" /></main>
+  <footer>
+    <button class="ghost" id="prev" type="button">← Назад</button>
+    <div class="dots" id="dots"></div>
+    <button id="next" type="button">Далее →</button>
+  </footer>
+  <script>
+    const frames = [
+      { src: "04-boot.jpg", title: "Заставка", note: "Бетон + график на стене. Меньше граффити" },
+      { src: "academy-l1.jpg", title: "Академия", note: "C1 открыта. Нав: Академия + Арена" },
+      { src: "05-lesson.jpg", title: "Урок C1.1", note: "Свеча как учебная схема. Врагов нет" },
+      { src: "arena-l1.jpg", title: "Арена L1", note: "Терминал → вопрос → карты. Без двух колонок" },
+      { src: "arena-l5-analysis.jpg", title: "Арена L5", note: "+ объём и новости внутри терминала" },
+      { src: "feedback-wick.jpg", title: "Фидбек", note: "Wick Mimic после ответа" }
+    ];
+    let i = 0;
+    const img = document.getElementById("frame");
+    const step = document.getElementById("step");
+    const cap = document.getElementById("cap");
+    const prev = document.getElementById("prev");
+    const next = document.getElementById("next");
+    const dots = document.getElementById("dots");
+    frames.forEach((_, n) => { const d = document.createElement("i"); d.onclick = () => show(n); dots.appendChild(d); });
+    function show(n) {
+      i = Math.max(0, Math.min(frames.length - 1, n));
+      const f = frames[i];
+      img.src = f.src; img.alt = f.title;
+      step.textContent = String(i+1).padStart(2,"0") + " / " + String(frames.length).padStart(2,"0");
+      cap.innerHTML = f.title + "<span><small>" + f.note + "</small></span>";
+      prev.disabled = i === 0;
+      next.textContent = i === frames.length - 1 ? "Сначала" : "Далее →";
+      [...dots.children].forEach((d,k) => d.classList.toggle("on", k === i));
+    }
+    prev.onclick = () => show(i-1);
+    next.onclick = () => show(i === frames.length-1 ? 0 : i+1);
+    window.addEventListener("keydown", e => {
+      if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); next.click(); }
+      if (e.key === "ArrowLeft") prev.click();
+    });
+    show(0);
+  </script>
+</body>
+</html>
