@@ -88,3 +88,47 @@ npm run build && npm run preview
 - [x] S3 содержит второй домен, ≤3 вкладок, дистракторы с типом ошибки/врагом
 
 Дальше: подключить `design-system.html` токены IV эпохи, контент-пакет 60 шаблонов (Приложение Б), Zod-схемы и серверную валидацию по `attempt`.
+
+---
+
+## 8. Полный юзерфлоу и все страницы (добавлено)
+
+Теперь прототип — сквозной путь «первый вход → Арена». Все страницы зарегистрированы как сцены (`src/config/gameConfig.ts`):
+
+| Сцена | Назначение |
+|---|---|
+| `OnboardingScene` | первый вход (3 шага), ставит флаг `onboarding_done` |
+| `ArenaScene` | задание 4 блока + M1–M15 |
+| `AcademyScene` | путь глав + урок (микро-проверка, выдача карты) |
+| `CollectionScene` | карты (ранги) + трофеи (стадии-слои) + свиток M7 + калибровка M3 |
+| `MoreScene` | профиль + сервисные разделы (Ещё) |
+| `ErrorJournalScene` | свиток ошибок M7 |
+| `MasteryCheckScene` | готовность к экзамену главы |
+| `DailyWarmupScene` | разминка дня (M13 погода + M7 приоритет) |
+| `TournamentScene` | турниры / тень M14 |
+| `StoreScene` | маркет косметики (SIG только косметика) |
+| `SettingsScene` | настройки + сброс → первый вход |
+
+Общий скелет (топ-бар + низ) вынесен в `src/engine/shell.ts`; навигация взрослеет по эпохам (`navForEpoch`).
+
+## 9. Заглушки-рендеры (SVG-база → PNG)
+
+`scripts/gen-placeholders.mjs` генерирует весь placeholder-арт:
+
+```
+node scripts/gen-placeholders.mjs
+# → public/assets/render/enemies/*   (33 врага x стадии + _icon + _avatar = 182 SVG)
+# → public/assets/render/cards/*     (17 карт + Cwait = 18 SVG)
+# → public/assets/render/icons/*     (4 nav + 6 домен = 10 SVG)
+# → public/assets/manifest.json, icon-index.json
+```
+
+Стиль-микс: **10% fight / 30% finance / 30% flat-3D / 30% terminal** (см. `ART_SPEC.md`). Phaser грузит SVG в `BootScene` через `this.load.svg(...)` и растрирует в текстуру — интерфейс проверяется сразу, без ручной сборки PNG.
+
+## 10. Документы
+
+- `ART_SPEC.md` — размеры изображений + полный список графики (иконки vs иллюстрации) + пайплайн SVG→PNG + стиль-микс.
+- `USERFLOW.md` — полный путь от первого входа + карта страниц→сцен + как проверить демо.
+- `THIRD_PARTY_ASSETS.md` — реестр лицензий сторонних ассетов (схема записи + источники).
+- `src/data/combos.ts` — реестр комбо K01–K17 / T01–T08 (ТЗ Часть 4 §6).
+- `src/data/enemies.ts` — полный ростер **33 врагов** (ТЗ Часть 4 §5), S3 всегда добавляет второй домен.

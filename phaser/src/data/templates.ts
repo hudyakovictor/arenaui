@@ -1,4 +1,7 @@
 import type { EncounterTemplate } from '../types';
+import { enemyById } from './enemies';
+import { cardById } from './cards';
+import { sourceById } from './sources';
 
 // MVP-набор шаблонов — по одному на врага/стадию, покрывает M1-M15
 // Учебная цель → рыночная ситуация → атомы → источники → враг/стадия — порядок из ТЗ 1 §6.2
@@ -149,3 +152,72 @@ export const templates: EncounterTemplate[] = [
 ];
 
 export const templateById = Object.fromEntries(templates.map(t=>[t.id,t])) as Record<string,EncounterTemplate>;
+
+// ── Синтез шаблона для ЛЮБОГО врага/стадии (заглушка, чтобы весь ростер был проходим) ──
+// Порядок из ТЗ Часть 1 §6.2: учебная цель → ситуация → атомы/карты → источники → враг →
+// вопрос → 4 варианта (верный + 2 типовые ошибки + ЖДАТЬ) → улики → обратная связь.
+const FACTOR_HINT: Record<string,string> = {
+  'ликвидац':'Карта ликвидаций/плечо', 'стоп':'Стоп и исполнение', 'объём':'Объём', 'тренд':'Тренд',
+  'фейк':'Фейк-источник', 'новост':'Новость', 'анлок':'Анлоки', 'апрув':'Апрув', 'фишинг':'Фишинг',
+  'нарратив':'Нарратив', 'цикл':'Цикл', 'эмисси':'Эмиссия', 'просадк':'Просадка', 'депег':'Депег',
+};
+
+export function synthTemplate(enemyId: string, stageNum: number): EncounterTemplate {
+  const enemy = enemyById[enemyId];
+  const stage = enemy?.stages.find(s=>s.stage===stageNum) ?? enemy?.stages[0];
+  if(!enemy || !stage) return templates[0];
+
+  const cards = stage.requiredCards;
+  const skills = cards.map(c=>c.cardId);
+  const srcs = stage.sources.slice(0,3) as EncounterTemplate['sources'] & any[];
+  const sourceNames = srcs.map(id=>sourceById[id]?.short ?? id).join(' + ');
+  const goalHint = Object.entries(FACTOR_HINT).find(([k])=> stage.factor.toLowerCase().includes(k.toLowerCase()))?.[1] ?? 'сигнал';
+
+  // верный вариант строится от фактора стадии
+  const correctText = textFromFactor(stage.factor, enemy.name);
+  const isCorrect = 0;
+
+  return {
+    id:`SYN-${enemyId}-S${stage.stage}`,
+    learningGoal:`Распознать «${stage.factor}» и выбрать корректное действие`,
+    atoms: stage.requiredCards.map(c=>`${c.cardId}.1`), // атом по карте (заглушка — реальный атом из спецификации)
+    enemyId,
+    stage: stage.stage,
+    sources: srcs,
+    questionPool:[
+      `Ситуация: ${stage.factor}. Источники: ${sourceNames}. Твоё действие?`,
+      `Видишь «${stage.factor}». Что делаешь с позицией?`,
+    ],
+    answers:[
+      { label:'A', text: correctText, errorType:'' },
+      { label:'B', text:'Войти сразу — движение уже началось', errorType:'FOMO', enemyHint:'E05' },
+      { label:'C', text:'Увеличить позицию — сигнал сильный', errorType:'Leverage', enemyHint:'E04' },
+      { label:'D', text:'Ждать / не торговать', isWait:true, errorType:'' },
+    ],
+    correct: isCorrect,
+    evidence:[
+      { id:`ev-0`, source: srcs[0], label:`Ключевая улика в «${sourceNames}» подтверждает: ${stage.factor}`, isCorrect:true },
+      { id: `ev-1`, source: srcs[0], label:'Шум, не решающий сигнал', isCorrect:false },
+      ...(srcs[1] ? [{ id:'ev-2', source: srcs[1], label:'Второстепенная деталь', isCorrect:false }] as any : [])
+    ],
+    skills,
+    domain: enemy.domain,
+  };
+}
+
+function textFromFactor(factor: string, enemyName: string): string {
+  const f = factor.toLowerCase();
+  if(f.includes('плечо')||f.includes('ликвидац')||f.includes('размер')) return 'Снизить размер/плечо, зафиксировать стоп до входа';
+  if(f.includes('объём')) return 'Проверить подтверждение объёмом, не входить на «пустом» сигнале';
+  if(f.includes('фейк')||f.includes('новост')||f.includes('источник')) return 'Проверить источник, не торговать на неподтверждённом сигнале';
+  if(f.includes('анлок')) return 'Учесть давление продаж от анлока, не покупать на пике';
+  if(f.includes('апрув')||f.includes('фишинг')) return 'Отклонить подпись/домен, проверить лимиты и адрес';
+  if(f.includes('нарратив')||f.includes('цикл')||f.includes('эмисси')) return 'Не вестись на нарратив, смотреть на данные и структуру';
+  if(f.includes('просадк')||f.includes('депег')) return 'Сократить риск, зафиксировать потери и пересмотреть систему';
+  return `Действовать по подтверждённой улике, соблюдая ` + enemyName + '-риск';
+}
+
+export function templateFor(enemyId: string, stageNum: number): EncounterTemplate {
+  const hand = templates.find(t=> t.enemyId===enemyId && t.stage===stageNum);
+  return hand ?? synthTemplate(enemyId, stageNum);
+}

@@ -3,6 +3,7 @@ import { gameState } from '../state/GameState';
 import { cards } from '../data/cards';
 import { enemies, enemyById } from '../data/enemies';
 import { epochOf } from '../config/epochConfig';
+import { enemyAvatarKey, enemyRenderKey } from '../engine/assetKeys';
 
 const COLORS={ bg:0x070B14, surface:0x0C1323, elevated:0x111B2E, border:0x22304A, cyan:0x31D6C4, good:0x3BDE8A, bad:0xFF596D, muted:0x62708A, strong:0x344563, text:0xE9F2FF };
 
@@ -53,22 +54,34 @@ export class CollectionScene extends Phaser.Scene {
       const col = stage===0? 0x22304A : mastered? 0xFFB341 : 0xB783FF;
       this.add.rectangle(cx,cy,86,86, 0x0C1323).setStrokeStyle(1, col).setOrigin(0).setInteractive().on('pointerdown', ()=>{
         const sheet=this.add.rectangle(0,0,390,844, 0x070B14, 0.94).setOrigin(0).setInteractive();
-        this.add.text(195, 220, e.name, { fontFamily:'Inter, sans-serif', fontSize:'16px', color:'#E9F2FF'}).setOrigin(0.5);
-        this.add.text(195, 240, `${e.domain} · ранг ${e.rankDanger} · ${e.mode}`, { fontFamily:'IBM Plex Mono, monospace', fontSize:'8px', color:'#93A3BC'}).setOrigin(0.5);
+        this.add.text(195, 248, e.name, { fontFamily:'Inter, sans-serif', fontSize:'16px', color:'#E9F2FF'}).setOrigin(0.5);
+        this.add.text(195, 266, `${e.domain} · ранг ${e.rankDanger} · ${e.mode}`, { fontFamily:'IBM Plex Mono, monospace', fontSize:'8px', color:'#93A3BC'}).setOrigin(0.5);
+        // заглушка-рендер достигнутой стадии (SVG → текстура)
+        const reachedStage = e.stages.find(s=> stage>=s.stage) ?? e.stages[0];
+        const renderKey = enemyRenderKey(e.id, reachedStage.stage);
+        if(this.textures.exists(renderKey)){
+          this.add.rectangle(195, 288, 92, 92, 0x060A12).setStrokeStyle(1, col).setOrigin(0.5,0);
+          this.add.image(195, 334, renderKey).setDisplaySize(80,80);
+        }
         e.stages.forEach((s,j)=>{
-          const yy=270+j*42;
+          const yy=388+j*36;
           const reached = stage>=s.stage;
-          this.add.rectangle(20,yy,350,36, reached? 0x0C1323:0x060A12).setStrokeStyle(1, reached? 0x344563:0x22304A).setOrigin(0);
+          this.add.rectangle(20,yy,350,34, reached? 0x0C1323:0x060A12).setStrokeStyle(1, reached? 0x344563:0x22304A).setOrigin(0);
           this.add.text(28, yy+6, `S${s.stage} · L${s.level} · ${s.requiredCards.map(c=>c.cardId+'r'+c.rank).join(' + ')}`, { fontFamily:'IBM Plex Mono, monospace', fontSize:'7px', color: reached?'#E9F2FF':'#62708A'}).setOrigin(0);
           this.add.text(28, yy+18, s.factor, { fontFamily:'Inter, sans-serif', fontSize:'8px', color: reached?'#93A3BC':'#62708A', wordWrap:{width:334}}).setOrigin(0);
-          if(s.secondDomain) this.add.text(320, yy+6, s.secondDomain.slice(0,3), { fontFamily:'IBM Plex Mono, monospace', fontSize:'7px', color:'#FFB341'}).setOrigin(0);
+          if(s.secondDomain) this.add.text(322, yy+6, s.secondDomain.slice(0,3), { fontFamily:'IBM Plex Mono, monospace', fontSize:'7px', color:'#FFB341'}).setOrigin(0);
         });
-        this.add.text(195, 460, 'Слои S2–S4 — одна поза мастера + альфа-слои. Пресеты собираются скриптом.', { fontFamily:'IBM Plex Mono, monospace', fontSize:'7px', color:'#62708A', wordWrap:{width:340}}).setOrigin(0.5);
-        this.add.text(195, 520,'✕ закрыть', { fontFamily:'Inter, sans-serif', fontSize:'12px', color:'#93A3BC'}).setOrigin(0.5).setInteractive().on('pointerdown', ()=> sheet.destroy());
+        this.add.text(195, 560, 'Слои S2–S4 — одна поза мастера + альфа-слои. Пресеты собираются скриптом.', { fontFamily:'IBM Plex Mono, monospace', fontSize:'7px', color:'#62708A', wordWrap:{width:340}}).setOrigin(0.5);
+        this.add.text(195, 606,'✕ закрыть', { fontFamily:'Inter, sans-serif', fontSize:'12px', color:'#93A3BC'}).setOrigin(0.5).setInteractive().on('pointerdown', ()=> sheet.destroy());
       });
-      // аватар — тизер 5-8% rim до раскрытия
-      this.add.circle(cx+43, cy+28, 18, 0x060A12).setStrokeStyle(1, col);
-      this.add.text(cx+43, cy+28, stage? '◉':'?', { fontFamily:'IBM Plex Mono, monospace', fontSize:'12px', color: toHex(col)}).setOrigin(0.5);
+      // аватар — тизер 5-8% rim до раскрытия (SVG-заглушка)
+      this.add.circle(cx+43, cy+28, 20, 0x060A12).setStrokeStyle(1, col);
+      const avKey = enemyAvatarKey(e.id);
+      if(this.textures.exists(avKey)){
+        this.add.image(cx+43, cy+28, avKey).setDisplaySize(34,34).setAlpha(stage? 1:0.7);
+      } else {
+        this.add.text(cx+43, cy+28, stage? '◉':'?', { fontFamily:'IBM Plex Mono, monospace', fontSize:'12px', color: toHex(col)}).setOrigin(0.5);
+      }
       this.add.text(cx+43, cy+54, e.name.split(' ')[0].slice(0,8), { fontFamily:'IBM Plex Mono, monospace', fontSize:'7px', color:'#93A3BC'}).setOrigin(0.5);
       this.add.text(cx+43, cy+66, stage? `S${stage}/4`:'SILHOUETTE', { fontFamily:'IBM Plex Mono, monospace', fontSize:'7px', color: stage?'#3BDE8A':'#62708A'}).setOrigin(0.5);
       if(stage) this.add.rectangle(cx, cy+78, 86, 4, col).setOrigin(0);
@@ -111,7 +124,7 @@ export class CollectionScene extends Phaser.Scene {
       {label:'ACADEMY', go:'AcademyScene'},
       {label:'ARENA', go:'ArenaScene'},
       {label:'COLLECTION', active:true},
-      {label:'MORE'},
+      {label:'MORE', go:'MoreScene'},
     ] as any[];
     items.forEach((it,i)=>{
       const nx=i*(390/4);
