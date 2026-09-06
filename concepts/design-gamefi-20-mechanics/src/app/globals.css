@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #070b14;
+  --color-inset: #060a12;
+  --color-surface: #0c1323;
+  --color-elevated: #111b2e;
+  --color-hover: #14223a;
+  --color-text: #e9f2ff;
+  --color-sub: #93a3bc;
+  --color-muted: #62708a;
+  --color-disabled: #46536a;
+  --color-border: #22304a;
+  --color-strong: #344563;
+  --color-primary: #31d6c4;
+  --color-good: #3bde8a;
+  --color-bad: #ff596d;
+  --color-warn: #ffb341;
+  --color-paper: #e7dfd0;
+  --color-ink: #1c1916;
+  --color-info: #59a7ff;
+  --color-technical: #50c8ff;
+  --color-risk: #ff5c70;
+  --color-context: #f4b84b;
+  --color-crypto: #b783ff;
+  --color-human: #ff77bd;
+  --color-cognitive: #9ca8ff;
+
+  --font-ui: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial,
+    sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+}
+
+/* Phone frame — canonical 390x844 from previous concept deliveries */
+.phone {
+  width: 390px;
+  height: 844px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-radius: 28px;
+  border: 1px solid var(--color-strong);
+  box-shadow:
+    0 0 0 6px #03060c,
+    0 30px 80px rgba(0, 0, 0, 0.7),
+    0 0 60px rgba(49, 214, 196, 0.06);
+  flex-shrink: 0;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.grid-panel {
+  background-image:
+    linear-gradient(rgba(80, 200, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(80, 200, 255, 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.015) 0px,
+    rgba(255, 255, 255, 0.015) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+.paper {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.tabloid-title {
+  font-family: var(--font-ui);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(49, 214, 196, 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(49, 214, 196, 0);
+  }
+}
+.pulse-ring {
+  animation: pulse-ring 1.6s ease-out infinite;
+}
+
+@keyframes ghost-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.ghost-float {
+  animation: ghost-float 3.5s ease-in-out infinite;
+}
+
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.ticker {
+  animation: ticker 40s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

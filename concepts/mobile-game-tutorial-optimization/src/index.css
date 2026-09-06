@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #070b14;
+  --color-inset: #0a0f1c;
+  --color-surface: #0e1524;
+  --color-elevated: #141d31;
+  --color-hover: #1a2540;
+  --color-border: #1f2a44;
+  --color-strong: #2c3a5c;
+  --color-accent: #31d6c4;
+  --color-good: #3bde8a;
+  --color-bad: #ff596d;
+  --color-warn: #ffb341;
+  --color-info: #59a7ff;
+  --color-crypto: #b98cff;
+  --color-text: #e8edf6;
+  --color-sub: #9aa6bd;
+  --color-muted: #5f6b84;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace;
+  --font-display: "Unbounded", "Inter", sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(49, 214, 196, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(49, 214, 196, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(49, 214, 196, 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(49, 214, 196, 0);
+  }
+}
+
+.anim-in {
+  animation: slide-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.anim-grow {
+  transform-origin: left;
+  animation: grow-x 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.delay-1 { animation-delay: 0.06s; }
+.delay-2 { animation-delay: 0.12s; }
+.delay-3 { animation-delay: 0.18s; }
+.delay-4 { animation-delay: 0.24s; }
+.delay-5 { animation-delay: 0.3s; }
+.delay-6 { animation-delay: 0.36s; }
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--color-strong);
+  border-radius: 999px;
+}

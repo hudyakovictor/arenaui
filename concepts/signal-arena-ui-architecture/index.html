@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signal Arena — Эпохи v2 · один источник токенов</title>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{ --page:#07090e; --line:#1b2230; }
+  body{ background:var(--page); color:#e6e9f0; font-family:Inter,system-ui,sans-serif; }
+  .mono{ font-family:'IBM Plex Mono',monospace; }
+  .panel{ background:#0d1119; border:1px solid var(--line); border-radius:14px; }
+  .h{ font-family:Oswald,Inter,sans-serif; letter-spacing:.04em; text-transform:uppercase; }
+
+  /* ===== PHONE / ArenaScene (390x844) — всё от CSS-переменных эпохи ===== */
+  .phone{
+    width:390px; height:844px; flex:none; position:relative; overflow:hidden;
+    background:var(--bg); color:var(--text); font-family:var(--font-ui);
+    border-radius:34px; border:1px solid #1f2632; box-shadow:0 30px 80px rgba(0,0,0,.6), inset 0 0 0 6px #0b0e14;
+    display:flex; flex-direction:column; padding:10px 10px 0;
+    transition:background .35s;
+  }
+  .phone[data-texture="grid"]::before{
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:.35;
+    background-image:linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size:26px 26px;
+  }
+  .phone[data-texture="brick"] .question{
+    background-color:#161114;
+    background-image:
+      linear-gradient(335deg, #1d1518 23px, transparent 23px),
+      linear-gradient(155deg, #1d1518 23px, transparent 23px),
+      linear-gradient(335deg, #1d1518 23px, transparent 23px),
+      linear-gradient(155deg, #1d1518 23px, transparent 23px);
+    background-size:58px 58px; background-position:0 2px, 4px 35px, 29px 31px, 34px 6px;
+    border:2px solid var(--accent);
+  }
+  .phone[data-texture="brick"] .question .q{ font-weight:700; font-size:22px; line-height:1.05; text-shadow:0 0 14px var(--accent); }
+  .phone[data-texture="brick"] .card,.phone[data-texture="brick"] .answer{ border-width:2px; }
+  .blk{ border-radius:var(--radius); border:1px solid var(--border); background:var(--surface); }
+
+  .rail{ height:44px; flex:none; display:flex; align-items:center; gap:8px; padding:0 10px; font-family:var(--font-mono); font-size:11px; }
+  .rail b{ color:var(--accent); font-weight:600; }
+  .question{ flex:none; margin-top:8px; padding:12px 14px; background:var(--paper); color:var(--ink); }
+  .question .tag{ font-size:10px; letter-spacing:.14em; color:var(--inksub); font-family:var(--font-mono); }
+  .question .q{ font-family:var(--font-head); font-size:17px; line-height:1.2; margin-top:3px; }
+  .threat{ flex:none; margin-top:8px; height:40px; display:flex; align-items:center; gap:10px; padding:0 12px; font-family:var(--font-mono); font-size:11px; }
+  .threat .dot{ width:8px; height:8px; border-radius:99px; background:var(--bad); box-shadow:0 0 10px var(--bad); animation:pulse 1.4s infinite; }
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+  .browser{ flex:1 1 auto; min-height:0; margin-top:8px; display:flex; flex-direction:column; overflow:hidden; }
+  .tabs{ flex:none; display:flex; border-bottom:1px solid var(--border); }
+  .tab{ flex:1; text-align:center; padding:8px 0; font-size:10px; letter-spacing:.1em; font-family:var(--font-mono); color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; }
+  .tab.on{ color:var(--accent); border-bottom-color:var(--accent); }
+  .tab.blind{ text-decoration:line-through; opacity:.5; }
+  .chart{ flex:1 1 auto; min-height:60px; position:relative; }
+  .chart svg{ position:absolute; inset:0; width:100%; height:100%; }
+  .clues{ flex:none; display:flex; gap:6px; padding:8px; overflow-x:auto; border-top:1px solid var(--border); }
+  .clue{ flex:none; padding:6px 8px; border-radius:calc(var(--radius) - 4px); border:1px solid var(--border); background:var(--elevated); font-size:10px; cursor:pointer; user-select:none; }
+  .clue small{ display:block; font-family:var(--font-mono); font-size:9px; color:var(--sub); margin-top:2px; }
+  .clue.key.hl{ border-color:var(--accent); box-shadow:0 0 0 1px var(--accent), 0 0 12px color-mix(in srgb,var(--accent) 60%,transparent); }
+  .clue.sel{ background:color-mix(in srgb,var(--accent) 22%,var(--elevated)); border-color:var(--accent); }
+  .clue small.lie{ color:var(--warn); }
+
+  .estrip{ flex:none; margin-top:8px; height:36px; display:flex; align-items:center; gap:6px; padding:0 10px; font-family:var(--font-mono); font-size:10px; color:var(--sub); }
+  .estrip .pill{ padding:3px 7px; border-radius:99px; background:var(--accent); color:#000; font-weight:600; }
+  .estrip .slot{ width:26px; height:18px; border:1px dashed var(--strong); border-radius:6px; }
+  .toact{ margin-left:auto; padding:4px 8px; border-radius:6px; background:var(--accent); color:#000; font-weight:700; font-size:10px; cursor:pointer; }
+
+  .cards{ flex:none; margin-top:8px; display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .card{ aspect-ratio:1/1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-size:10px; font-family:var(--font-mono); color:var(--sub); cursor:pointer; }
+  .card i{ font-style:normal; font-size:20px; }
+  .card.locked{ opacity:.35; }
+
+  .answers{ flex:none; margin-top:8px; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .answer{ height:46px; display:flex; align-items:center; justify-content:center; font-family:var(--font-head); font-size:14px; letter-spacing:.06em; cursor:pointer; transition:transform .08s; }
+  .answer:active{ transform:scale(.97); }
+  .answer.good{ background:color-mix(in srgb,var(--good) 25%,var(--surface)); border-color:var(--good); }
+  .answer.bad{ background:color-mix(in srgb,var(--bad) 25%,var(--surface)); border-color:var(--bad); }
+
+  .nav{ flex:none; height:60px; margin:8px -10px 0; border-top:1px solid var(--border); background:var(--inset); display:flex; }
+  .nav div{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; font-size:8px; letter-spacing:.12em; font-family:var(--font-mono); color:var(--muted); }
+  .nav div.on{ color:var(--accent); }
+  .nav div.lock{ opacity:.3; }
+  .nav i{ font-style:normal; font-size:16px; }
+
+  .overlay{ position:absolute; inset:0; z-index:20; background:rgba(0,0,0,.86); backdrop-filter:blur(6px); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:28px; cursor:pointer; }
+  .overlay .big{ font-family:var(--font-head); font-size:34px; color:var(--accent); line-height:1; }
+  .overlay .motto{ font-family:var(--font-mono); font-size:12px; color:var(--sub); margin-top:14px; line-height:1.5; }
+  .overlay ul{ text-align:left; margin-top:18px; font-size:12px; color:var(--text); line-height:1.7; }
+
+  /* ===== right side ===== */
+  .seg{ display:flex; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  .seg button{ flex:1; padding:8px 10px; font-size:12px; color:#9aa3b5; background:transparent; }
+  .seg button.on{ background:#1a2130; color:#fff; font-weight:600; }
+  .bar{ display:flex; height:30px; border-radius:8px; overflow:hidden; border:1px solid var(--line); position:relative; }
+  .bar div{ display:flex; align-items:center; justify-content:center; font-size:10px; font-family:'IBM Plex Mono',monospace; color:#000; font-weight:600; transition:flex .25s; }
+  .bar .cursor{ position:absolute; top:0; bottom:0; width:2px; background:#fff; box-shadow:0 0 8px #fff; transition:left .15s; }
+  input[type=range]{ width:100%; accent-color:#c8ff00; }
+  .tok{ display:flex; align-items:center; gap:8px; font-size:11px; font-family:'IBM Plex Mono',monospace; color:#aab3c5; }
+  .tok span.sw{ width:14px; height:14px; border-radius:4px; border:1px solid #2a3344; }
+  .mrow{ display:grid; grid-template-columns:44px 1fr 56px 72px; gap:8px; align-items:center; font-size:11px; padding:5px 8px; border-radius:8px; }
+  .mrow.now{ background:#141b29; }
+  .mrow.future{ opacity:.45; }
+  .badge{ font-family:'IBM Plex Mono',monospace; font-size:10px; padding:2px 6px; border-radius:6px; color:#000; font-weight:600; text-align:center; }
+  .num{ width:56px; background:#0a0e15; border:1px solid var(--line); border-radius:8px; padding:4px 6px; font-size:12px; font-family:'IBM Plex Mono',monospace; text-align:center; color:#fff; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<header class="max-w-[1320px] mx-auto px-6 pt-8 pb-4 flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <div class="mono text-[11px] tracking-[.2em] text-[#6f7a90]">SIGNAL ARENA · ARENASCENE · ЭПОХИ v2</div>
+    <h1 class="h text-3xl font-bold mt-1">Один скин · один скелет · эпоха меняет правила, не цвет</h1>
+    <p class="text-sm text-[#9aa3b5] mt-2 max-w-2xl">Прототип: палитра одна на всю игру (согласованная «Улица»). Эпоха — это набор правил: какие ярлыки видны, сколько улик нужно, какой стек карт, какие вкладки открыты. Раскладка вычисляется (nav прибит к низу, браузер получает остаток), механики привязаны к эпохе, а не к абсолютному уровню, Терминал — финал.</p>
+  </div>
+  <div class="panel px-4 py-3 text-xs text-[#9aa3b5]">
+    <div class="mono text-[10px] tracking-widest text-[#6f7a90] mb-1">ИСТОЧНИК ИСТИНЫ</div>
+    <div><span class="text-[#ff596d] line-through">4 палитры × 2 файла</span> → <span class="text-[#c8ff00]">1 палитра</span> + <span class="text-[#c8ff00]">epochs[id]</span> (правила)</div>
+  </div>
+</header>
+
+<main class="max-w-[1320px] mx-auto px-6 pb-16 grid gap-8" style="grid-template-columns: 390px 1fr;">
+
+  <!-- ================= PHONE ================= -->
+  <div>
+    <div id="phone" class="phone">
+      <div class="rail blk">
+        <span>XP <b id="rXp">120</b></span>
+        <span>SIG <b id="rSig">3</b></span>
+        <span>RISK <b id="rBud">4/5</b></span>
+        <span class="ml-auto">L<b id="rLvl">1</b></span>
+        <span id="rWeather">☁︎ ШУМ</span>
+      </div>
+
+      <div class="question blk">
+        <div class="tag" id="qTag">ВСТРЕЧА · ЭПОХА I</div>
+        <div class="q" id="qText">Кто-то кричит про иксы. Что здесь настоящее?</div>
+      </div>
+
+      <div class="threat blk">
+        <span class="dot"></span>
+        <span id="threatName">UNKNOWN THREAT</span>
+        <span class="ml-auto" style="color:var(--muted)" id="threatStage">СТАДИЯ 1/3</span>
+      </div>
+
+      <div class="browser blk">
+        <div class="tabs" id="tabs"></div>
+        <div class="chart"><svg id="chart" viewBox="0 0 370 200" preserveAspectRatio="none"></svg></div>
+        <div class="clues" id="clues"></div>
+      </div>
+
+      <div class="estrip blk" id="estrip"></div>
+
+      <div class="cards" id="cards"></div>
+
+      <div class="answers" id="answers"></div>
+
+      <div class="nav" id="nav"></div>
+
+      <div class="overlay hidden" id="overlay">
+        <div class="mono text-[10px] tracking-[.3em]" style="color:var(--sub)">ЭПОХА СМЕНИЛАСЬ</div>
+        <div class="big mt-2" id="ovName">КАБИНЕТ</div>
+        <div class="motto" id="ovMotto"></div>
+        <ul id="ovList"></ul>
+        <div class="mono text-[10px] mt-6" style="color:var(--muted)">КОСНИСЬ, ЧТОБЫ ПРОДОЛЖИТЬ</div>
+      </div>
+    </div>
+    <div class="mono text-[10px] text-[#6f7a90] mt-3 text-center">390 × 844 · раскладка: flex-column, браузер = остаток, nav якорится к низу</div>
+  </div>
+
+  <!-- ================= CONTROLS ================= -->
+  <div class="space-y-5">
+
+    <!-- level -->
+    <section class="panel p-5">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <div class="mono text-[10px] tracking-widest text-[#6f7a90]">УРОВЕНЬ → ЭПОХА</div>
+          <div class="h text-2xl font-bold mt-1">L<span id="lvlBig">1</span> · <span id="epochBig">УЛИЦА</span></div>
+        </div>
+        <div class="flex gap-2">
+          <button id="prev" class="px-3 py-2 rounded-lg bg-[#161c29] hover:bg-[#1f2738] text-sm">−1</button>
+          <button id="next" class="px-3 py-2 rounded-lg bg-[#c8ff00] text-black font-semibold text-sm hover:brightness-110">Следующий уровень →</button>
+        </div>
+      </div>
+      <input id="lvl" type="range" min="1" max="99" value="1" class="mt-4">
+      <div class="bar mt-3" id="bar"></div>
+      <div class="flex justify-between mono text-[10px] text-[#6f7a90] mt-1"><span>1</span><span>99</span></div>
+    </section>
+
+    <!-- scheme -->
+    <section class="panel p-5">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div class="mono text-[10px] tracking-widest text-[#6f7a90]">СХЕМА ЭПОХ</div>
+          <div class="text-sm text-[#9aa3b5] mt-1" id="schemeNote"></div>
+        </div>
+        <div class="seg w-64">
+          <button data-s="old">Было (20/30/30/19)</button>
+          <button data-s="new" class="on">Стало (Терминал в конце)</button>
+        </div>
+      </div>
+      <div class="grid grid-cols-4 gap-3 mt-4" id="ranges"></div>
+      <p class="text-[11px] text-[#6f7a90] mt-3">Границы можно двигать — всё ниже (эпоха, токены, механики, оверлей) пересчитывается из одного массива. Именно так должен работать <span class="mono">getEpochForLevel()</span>: не четыре if-а, а таблица.</p>
+    </section>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      <!-- tokens -->
+      <section class="panel p-5">
+        <div class="mono text-[10px] tracking-widest text-[#6f7a90]">ТОКЕНЫ ЭПОХИ · <span id="tokId"></span></div>
+        <div class="grid grid-cols-2 gap-x-4 gap-y-2 mt-3" id="tokens"></div>
+        <div class="mt-4 pt-3 border-t border-[#1b2230] text-[11px] text-[#9aa3b5] space-y-1" id="fonts"></div>
+      </section>
+
+      <!-- gameplay -->
+      <section class="panel p-5">
+        <div class="mono text-[10px] tracking-widest text-[#6f7a90]">ЧТО МЕНЯЕТ ЭПОХА В ИГРЕ (не только цвет)</div>
+        <div class="mt-3 space-y-2 text-sm" id="game"></div>
+        <div class="mt-4 pt-3 border-t border-[#1b2230] mono text-[11px] text-[#9aa3b5] leading-relaxed" id="motto"></div>
+      </section>
+    </div>
+
+    <!-- mechanics -->
+    <section class="panel p-5">
+      <div class="flex items-center justify-between">
+        <div class="mono text-[10px] tracking-widest text-[#6f7a90]">МЕХАНИКИ M1–M15 · ПРИВЯЗКА К ЭПОХЕ + СМЕЩЕНИЕ, А НЕ К АБСОЛЮТНОМУ УРОВНЮ</div>
+        <div class="mono text-[10px] text-[#6f7a90]">уровни пересчитываются при сдвиге границ</div>
+      </div>
+      <div class="mt-3 space-y-0.5" id="mechs"></div>
+    </section>
+
+    <!-- diff -->
+    <section class="panel p-5">
+      <div class="mono text-[10px] tracking-widest text-[#6f7a90]">ЧТО ИСПРАВЛЯЕТ ЭТА СХЕМА</div>
+      <div class="grid md:grid-cols-3 gap-4 mt-3 text-[12px] leading-relaxed">
+        <div class="bg-[#0a0e15] rounded-xl p-3 border border-[#1b2230]">
+          <div class="text-[#ff596d] font-semibold mb-1">Было: 4 палитры в 2 файлах</div>
+          palette.ts (лайм <span class="mono">#c8ff00</span>) и epochConfig.ts (бирюза <span class="mono">#31D6C4</span>) расходились, плюс три недоделанных скина для II–IV.
+          <div class="text-[#3bde8a] font-semibold mt-2 mb-1">Стало</div>
+          Одна палитра на всю игру. <span class="mono">epochs[id]</span> хранит только правила: костыли, улики, стек, nav, motto. Перекрашивать нечего — ломаться нечему.
+        </div>
+        <div class="bg-[#0a0e15] rounded-xl p-3 border border-[#1b2230]">
+          <div class="text-[#ff596d] font-semibold mb-1">Было: фиксированные Y</div>
+          Блок вопроса без кирпича выше/ниже → всё едет, nav прибит к y=784, пустоты или наложение.
+          <div class="text-[#3bde8a] font-semibold mt-2 mb-1">Стало</div>
+          Колонка: rail, вопрос, threat — фикс; браузер — остаток; strip, карты, ответы, nav — фикс снизу. Смена эпохи не ломает высоты.
+        </div>
+        <div class="bg-[#0a0e15] rounded-xl p-3 border border-[#1b2230]">
+          <div class="text-[#ff596d] font-semibold mb-1">Было: эпоха = скин</div>
+          Смена 20→21 незаметна и не учит; Терминал приходит на L51, когда игрок ещё не готов — и уходит на биржу.
+          <div class="text-[#3bde8a] font-semibold mt-2 mb-1">Стало</div>
+          I–III растянуты, Терминал — финальные уровни. Каждая эпоха снимает костыль и открывает операцию; переход — через оверлей.
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+/* ============ ОДНА ПАЛИТРА НА ВСЕ ЭПОХИ (согласованный вид «Улица») ============ */
+const TOKENS = { bg:'#0a0b0d', inset:'#0a0b0d', surface:'#16181d', elevated:'#1e2126', border:'#33383f', strong:'#454b55',
+  accent:'#c8ff00', good:'#4ade80', bad:'#ff4d5e', warn:'#ffb341', text:'#f2f3f5', sub:'#b8bcc4', muted:'#7d838d',
+  paper:'#16181d', ink:'#f2f3f5', inkSub:'rgba(242,243,245,.55)', radius:16, texture:'brick',
+  fontHead:'Oswald, Inter, sans-serif', fontUi:'Inter, system-ui, sans-serif', fontMono:"'IBM Plex Mono', monospace" };
+
+/* ============ ЕДИНЫЙ ИСТОЧНИК ИСТИНЫ: epochs[id] — цвета общие, различаются только правила ============ */
+const EPOCHS = {
+  street: { roman:'I', name:'УЛИЦА', tokens:TOKENS,
+    motto:'ТЫ ЗДЕСЬ РАДИ ДЕНЕГ. ИМЕННО ПОЭТОМУ ТЫ УЖЕ В ОПАСНОСТИ.',
+    crutches:{ labels:'all', evidenceHighlights:true, toActionButton:true },
+    nav:['ACADEMY','ARENA'], evidenceNeed:1, stack:1, blindSource:false,
+    learn:['Все ярлыки на уликах подписаны','Ключевая улика подсвечена','Кнопка «К ДЕЙСТВИЮ» ведёт за руку','Нужна 1 улика для ответа'] },
+  cabinet: { roman:'II', name:'КАБИНЕТ', tokens:TOKENS,
+    motto:'РЫНОК — ЭТО НЕ ГРАФИК. ЭТО ЛЮДИ, КОТОРЫЕ РИСУЮТ ГРАФИК.',
+    crutches:{ labels:'partial', evidenceHighlights:false, toActionButton:false },
+    nav:['ACADEMY','ARENA','COLLECTION'], evidenceNeed:2, stack:2, blindSource:false,
+    learn:['Подписана только половина улик','Подсветка снята — ищи сам','Нужны 2 улики: вердикт конфликта','Стек из 2 карт действий'] },
+  system: { roman:'III', name:'СИСТЕМА', tokens:TOKENS,
+    motto:'СИСТЕМА РАБОТАЕТ. ПОКА ТЫ НЕ ВМЕШАЕШЬСЯ.',
+    crutches:{ labels:'false', evidenceHighlights:false, toActionButton:false },
+    nav:['ACADEMY','ARENA','COLLECTION','TOURNAMENTS'], evidenceNeed:2, stack:3, blindSource:true,
+    learn:['Ярлыки есть, но часть — ложные','Один источник «слепой»','Стек из 3 карт','Турниры открыты'] },
+  terminal: { roman:'IV', name:'ТЕРМИНАЛ', tokens:TOKENS,
+    motto:'ВОЛАТИЛЬНОСТЬ ВРЕМЕННА. ТВОЯ ОШИБКА — НАВСЕГДА.',
+    crutches:{ labels:'none', evidenceHighlights:false, toActionButton:false },
+    nav:['ACADEMY','ARENA','COLLECTION','TOURNAMENTS','MARKET'], evidenceNeed:3, stack:3, blindSource:true,
+    learn:['Ярлыков нет вообще — только данные','Цепочка из 3 улик (синтез)','Рынок открыт — ты готов к реальному терминалу'] },
+};
+/* Оттенки лайма — только для полосы прогресса справа, в игре не используются */
+const SHADE = { street:'#c8ff00', cabinet:'#a3d100', system:'#7fa300', terminal:'#5c7600' };
+
+/* Порядок + границы. Схема = массив, а не четыре if-а. */
+const SCHEMES = {
+  old: { order:['street','cabinet','terminal','system'], ends:[20,50,80,99],
+         note:'Как в epochConfig.ts сейчас: Терминал уже на L51, Система — финал.' },
+  new: { order:['street','cabinet','system','terminal'], ends:[30,60,85,99],
+         note:'I–III растянуты, Терминал — последние уровни: к бирже приходит готовый игрок.' },
+};
+
+/* Механики: (эпоха, смещение от её начала). Уровень — производная. */
+const MECHS = [
+  ['M1','Улики + evidence strip','street',0],['M6','График доигрывает','street',0],['M10','Вариант ЖДАТЬ в пуле','street',0],
+  ['M11','Детерминированная мутация','street',0],['M12','Враг 3–4 стадии','street',0],['M13','Погода дня','street',0],
+  ['M15','Бюджет риска в топ-баре','street',0],['M3','Ставка низко/средне/высоко','street',2],['M5','Опознание врага после ответа','street',7],
+  ['M2','Стек 2 карты','street',13],['M4','Вердикт конфликта','cabinet',0],['M7','Свиток ошибок полный','cabinet',0],
+  ['M8','Комбо-двойки','cabinet',7],['M9','Слепой источник','cabinet',9],['M14','Ложные ярлыки (не привязана в конфиге)','system',0],
+];
+
+const NAV_ALL = [['ACADEMY','▤'],['ARENA','◎'],['COLLECTION','◇'],['TOURNAMENTS','♛'],['MARKET','◫']];
+const CLUES = [
+  {t:'Объём ×6 за час', l:'ПОДОЗРИТЕЛЬНО', key:true, lie:'НОРМА'},
+  {t:'Аккаунт создан вчера', l:'КРАСНЫЙ ФЛАГ', key:true, lie:'ПРОВЕРЕНО'},
+  {t:'Пост: «последний шанс»', l:'ДАВЛЕНИЕ', key:false, lie:'ФАКТ'},
+  {t:'Контракт верифицирован', l:'НЕЙТРАЛЬНО', key:false, lie:'ГАРАНТИЯ'},
+  {t:'Ликвидность заперта 7д', l:'СЛАБО', key:false, lie:'НАДЁЖНО'},
+];
+const QUESTIONS = {
+  street:'Кто-то кричит про иксы. Что здесь настоящее?',
+  cabinet:'Два источника спорят. Кому верить и почему?',
+  system:'Ярлыки говорят «безопасно». Что говорят данные?',
+  terminal:'Собери цепочку из трёх улик и объясни движение.',
+};
+
+/* ============ STATE ============ */
+const S = { level:1, scheme:'new', ends:[...SCHEMES.new.ends], selected:new Set(), lastEpoch:null, answered:null };
+
+function ranges(){
+  const o = SCHEMES[S.scheme].order; let start=1;
+  return o.map((id,i)=>{ const r={id,from:start,to:S.ends[i]}; start=S.ends[i]+1; return r; });
+}
+function getEpochForLevel(l){ return ranges().find(r=>l>=r.from && l<=r.to)?.id ?? 'street'; }
+function epochStart(id){ return ranges().find(r=>r.id===id)?.from ?? 1; }
+function mechLevel(m){ return epochStart(m[2]) + m[3]; }
+
+/* ============ RENDER ============ */
+const $ = s=>document.querySelector(s);
+
+function applyTokens(ep){
+  const p=$('#phone'), t=ep.tokens;
+  const map={bg:'bg',inset:'inset',surface:'surface',elevated:'elevated',border:'border',strong:'strong',accent:'accent',good:'good',bad:'bad',warn:'warn',text:'text',sub:'sub',muted:'muted',paper:'paper',ink:'ink',inkSub:'inksub'};
+  for(const k in map) p.style.setProperty('--'+map[k], t[k]);
+  p.style.setProperty('--radius', t.radius+'px');
+  p.style.setProperty('--font-head', t.fontHead); p.style.setProperty('--font-ui', t.fontUi); p.style.setProperty('--font-mono', t.fontMono);
+  p.dataset.texture = t.texture;
+}
+
+function seeded(n){ let x=n*9301+49297; return ()=>{ x=(x*9301+49297)%233280; return x/233280; }; }
+function renderChart(){
+  const rnd=seeded(S.level*7+3); let y=110, pts=[];
+  for(let i=0;i<40;i++){ y+= (rnd()-0.5)*30 + (i>26? -3:1.2); y=Math.max(20,Math.min(180,y)); pts.push([i*370/39,y]); }
+  const past=pts.slice(0,28).map(p=>p.join(',')).join(' '), fut=pts.slice(27).map(p=>p.join(',')).join(' ');
+  const ep=EPOCHS[getEpochForLevel(S.level)];
+  $('#chart').innerHTML = `
+    <defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${ep.tokens.accent}" stop-opacity=".35"/><stop offset="1" stop-color="${ep.tokens.accent}" stop-opacity="0"/></linearGradient></defs>
+    ${[40,80,120,160].map(g=>`<line x1="0" x2="370" y1="${g}" y2="${g}" stroke="${ep.tokens.border}" stroke-width="1"/>`).join('')}
+    <polygon points="0,200 ${past} ${pts[27][0]},200" fill="url(#g)"/>
+    <polyline points="${past}" fill="none" stroke="${ep.tokens.accent}" stroke-width="2"/>
+    <polyline points="${fut}" fill="none" stroke="${ep.tokens.muted}" stroke-width="1.5" stroke-dasharray="4 4" opacity="${S.answered?1:0.25}"/>
+    <text x="${pts[27][0]+4}" y="14" font-size="9" fill="${ep.tokens.sub}" font-family="IBM Plex Mono">${S.answered?'ДОИГРЫВАЕТ →':'СЕЙЧАС'}</text>`;
+}
+
+function renderPhone(){
+  const id=getEpochForLevel(S.level), ep=EPOCHS[id], idx=SCHEMES[S.scheme].order.indexOf(id);
+  applyTokens(ep);
+  $('#rLvl').textContent=S.level; $('#rXp').textContent=S.level*120; $('#rSig').textContent=1+Math.floor(S.level/9);
+  $('#rWeather').textContent=['☁︎ ШУМ','☀︎ ЯСНО','⚡ ХАЙП','☂ FUD'][S.level%4];
+  $('#qTag').textContent=`ВСТРЕЧА · ЭПОХА ${ep.roman} · ${ep.name}`;
+  $('#qText').textContent=QUESTIONS[id];
+  $('#threatName').textContent = S.level%3===0 ? 'PUMP GROUP «MOON»' : 'UNKNOWN THREAT';
+  $('#threatStage').textContent=`СТАДИЯ ${1+S.level%3}/3`;
+
+  // tabs (источники); в blindSource один зачёркнут
+  const srcs=['NEWS','X','ONCHAIN','CHART'];
+  $('#tabs').innerHTML=srcs.map((s,i)=>`<div class="tab ${i===0?'on':''} ${ep.blindSource&&i===2?'blind':''}">${s}</div>`).join('');
+  $('#tabs').querySelectorAll('.tab').forEach(t=>t.onclick=()=>{ $('#tabs').querySelectorAll('.tab').forEach(x=>x.classList.remove('on')); t.classList.add('on'); });
+
+  // clues — костыли решают, что видно
+  $('#clues').innerHTML=CLUES.map((c,i)=>{
+    const lab=ep.crutches.labels;
+    let label='';
+    if(lab==='all') label=`<small>${c.l}</small>`;
+    else if(lab==='partial' && i%2===0) label=`<small>${c.l}</small>`;
+    else if(lab==='false') label=`<small class="${!c.key?'':'lie'}">${c.key?c.lie:c.l}</small>`;
+    return `<div class="clue ${c.key?'key':''} ${ep.crutches.evidenceHighlights?'hl':''} ${S.selected.has(i)?'sel':''}" data-i="${i}">${c.t}${label}</div>`;
+  }).join('');
+  $('#clues').querySelectorAll('.clue').forEach(el=>el.onclick=()=>{ const i=+el.dataset.i; S.selected.has(i)?S.selected.delete(i):S.selected.add(i); S.answered=null; renderPhone(); });
+
+  // evidence strip
+  const need=ep.evidenceNeed, sel=[...S.selected];
+  let strip=`<span>УЛИКИ ${sel.length}/${need}</span>`;
+  for(let i=0;i<need;i++) strip += sel[i]!==undefined ? `<span class="pill">#${sel[i]+1}</span>` : `<span class="slot"></span>`;
+  if(ep.crutches.toActionButton && sel.length>=need) strip+=`<span class="toact" onclick="document.querySelector('#answers').scrollIntoView()">К ДЕЙСТВИЮ →</span>`;
+  $('#estrip').innerHTML=strip;
+
+  // cards: стек
+  const cards=[['⏸','ЖДАТЬ'],['🔍','ПРОВЕРИТЬ'],['⚑','ФЛАГ'],['⇄','СРАВНИТЬ']];
+  $('#cards').innerHTML=cards.map((c,i)=>`<div class="card blk ${i>=ep.stack+1?'locked':''}"><i>${c[0]}</i>${c[1]}</div>`).join('');
+
+  // answers 2×2
+  const ans=[['ПАМП','bad'],['ШУМ','good'],['СИГНАЛ','bad'],['ЖДАТЬ','good']];
+  $('#answers').innerHTML=ans.map((a,i)=>`<div class="answer blk ${S.answered===i?a[1]:''}" data-i="${i}">${a[0]}</div>`).join('');
+  $('#answers').querySelectorAll('.answer').forEach(el=>el.onclick=()=>{ if(S.selected.size<need){ el.animate([{transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'none'}],{duration:180}); return;} S.answered=+el.dataset.i; renderPhone(); });
+
+  // nav: открытые вкладки = ep.nav
+  $('#nav').innerHTML=NAV_ALL.map(n=>`<div class="${n[0]==='ARENA'?'on':''} ${ep.nav.includes(n[0])?'':'lock'}"><i>${ep.nav.includes(n[0])?n[1]:'🔒'}</i>${n[0]}</div>`).join('');
+
+  renderChart();
+
+  // детектор смены эпохи → оверлей
+  if(S.lastEpoch && S.lastEpoch!==id){
+    $('#ovName').textContent=`${ep.roman} · ${ep.name}`; $('#ovMotto').textContent=ep.motto;
+    $('#ovList').innerHTML=ep.learn.map(l=>`<li>· ${l}</li>`).join('');
+    $('#overlay').classList.remove('hidden');
+  }
+  S.lastEpoch=id;
+}
+
+function renderSide(){
+  const id=getEpochForLevel(S.level), ep=EPOCHS[id], rs=ranges();
+  $('#lvl').value=S.level; $('#lvlBig').textContent=S.level; $('#epochBig').textContent=`${ep.roman} ${ep.name}`;
+  $('#schemeNote').textContent=SCHEMES[S.scheme].note;
+  document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.s===S.scheme));
+
+  $('#bar').innerHTML = rs.map(r=>`<div style="flex:${r.to-r.from+1};background:${SHADE[r.id]}">${EPOCHS[r.id].roman} ${r.from}–${r.to}</div>`).join('')
+    + `<span class="cursor" style="left:calc(${(S.level-1)/98*100}% - 1px)"></span>`;
+
+  $('#ranges').innerHTML = rs.map((r,i)=>`
+    <div class="bg-[#0a0e15] rounded-xl p-3 border border-[#1b2230]">
+      <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:${SHADE[r.id]}"></span><span class="text-xs font-semibold">${EPOCHS[r.id].roman} ${EPOCHS[r.id].name}</span></div>
+      <div class="flex items-center gap-2 mt-2 mono text-[11px] text-[#9aa3b5]">${r.from} → ${i<3?`<input class="num" type="number" min="${r.from}" max="${(S.ends[i+1]??99)-1}" value="${r.to}" data-i="${i}">`:'<span class="num inline-block">99</span>'}</div>
+      <div class="text-[10px] text-[#6f7a90] mt-1">${r.to-r.from+1} уровней</div>
+    </div>`).join('');
+  $('#ranges').querySelectorAll('input').forEach(inp=>inp.onchange=()=>{
+    const i=+inp.dataset.i; let v=+inp.value; const lo=rs[i].from, hi=(S.ends[i+1]??99)-1;
+    S.ends[i]=Math.max(lo,Math.min(hi,v)); renderAll();
+  });
+
+  $('#tokId').textContent=`общие для всех эпох`;
+  const t=ep.tokens;
+  $('#tokens').innerHTML=['bg','surface','elevated','border','accent','good','bad','warn','text','sub','muted','paper'].map(k=>`<div class="tok"><span class="sw" style="background:${t[k]}"></span>${k} <span class="ml-auto text-[#6f7a90]">${t[k]}</span></div>`).join('');
+  $('#fonts').innerHTML=`<div>head: <span class="mono text-white">${t.fontHead.split(',')[0].replace(/'/g,'')}</span> · radius <span class="mono text-white">${t.radius}px</span> · texture <span class="mono text-white">${t.texture}</span></div><div class="text-[#6f7a90]">Один скин на всю игру. Эпоха не перекрашивает интерфейс — она меняет правила.</div>`;
+
+  const c=ep.crutches;
+  const row=(k,v,on)=>`<div class="flex items-center justify-between bg-[#0a0e15] rounded-lg px-3 py-2 border border-[#1b2230]"><span class="text-[#9aa3b5]">${k}</span><span class="mono text-xs ${on?'text-[#3bde8a]':'text-[#ff596d]'}">${v}</span></div>`;
+  $('#game').innerHTML = row('Ярлыки на уликах', c.labels, c.labels==='all') + row('Подсветка ключевой улики', c.evidenceHighlights?'да':'нет', c.evidenceHighlights)
+    + row('Кнопка «К ДЕЙСТВИЮ»', c.toActionButton?'да':'нет', c.toActionButton) + row('Улик для ответа', ep.evidenceNeed, true)
+    + row('Стек карт', ep.stack, true) + row('Слепой источник', ep.blindSource?'да':'нет', !ep.blindSource) + row('Вкладки nav', ep.nav.length+'/5', true);
+  $('#motto').textContent='« '+ep.motto+' »';
+
+  $('#mechs').innerHTML = MECHS.map(m=>{const L=mechLevel(m); const e=EPOCHS[m[2]];
+    return `<div class="mrow ${L<=S.level?'now':'future'}"><span class="mono text-[#c8ff00]">${m[0]}</span><span>${m[1]}</span><span class="mono text-[#9aa3b5]">L${L}${L<=S.level?' ✓':''}</span><span class="badge" style="background:${e.tokens.accent}">${e.roman} +${m[3]}</span></div>`;}).join('');
+}
+
+function renderAll(){ renderPhone(); renderSide(); }
+
+/* ============ EVENTS ============ */
+$('#lvl').oninput=e=>{ S.level=+e.target.value; S.selected.clear(); S.answered=null; renderAll(); };
+$('#next').onclick=()=>{ if(S.level<99){ S.level++; S.selected.clear(); S.answered=null; renderAll(); } };
+$('#prev').onclick=()=>{ if(S.level>1){ S.level--; S.selected.clear(); S.answered=null; renderAll(); } };
+$('#overlay').onclick=()=>$('#overlay').classList.add('hidden');
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{ S.scheme=b.dataset.s; S.ends=[...SCHEMES[S.scheme].ends]; renderAll(); });
+document.addEventListener('keydown',e=>{ if(e.key==='ArrowRight') $('#next').click(); if(e.key==='ArrowLeft') $('#prev').click(); });
+
+renderAll();
+</script>
+</body>
+</html>

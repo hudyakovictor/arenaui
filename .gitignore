@@ -8,8 +8,6 @@ build
 .vite
 *.tsbuildinfo
 
-# Archived concept materials (superseded by docs/specs/CONCEPT_IDEAS.md)
-concepts/
 aibackend/
 
 # Old concept dump (superseded by docs/specs/LEARNING_METHODOLOGY.md)
