@@ -71,7 +71,7 @@ CRM — это одна страница в браузере, где сисад�
 | 2 | **Конфиги** | Балансы, погода, правила роста, scoring | JSON-редактор + A/B сегменты |
 | 3 | **Игроки** | Пользователи, устройства, прогресс, премиум | Поиск по ID/email, прогресс-линия |
 | 4 | **Сессии** | Запуск/остановка, аналитика попыток | Replay viewer, scatter plot |
-| 5 | **Ошибки** | Журнал всех ошибок игроков | Фильтр по атом/врагу/игроку |
+| 5 | **Ошибки** | Журнал всех ошибок игроков | Фильтр по навыку/врагу/игроку |
 | 6 | **Турниры** | Создание, управление, лидерборды | Calendar + real-time leaderboard |
 | 7 | **AI-конвейер** | Генерация контента, автотесты, аналитика | Draft queue, review panel, metrics |
 | 8 | **Магазин** | SKU, цены, монетизация | Catalog editor, purchase logs |
@@ -119,10 +119,10 @@ CRM — это одна страница в браузере, где сисад�
 ### 4.6 Progress & Academy
 | Метод | Путь | Auth | Тело | Ответ |
 |---|---|---|---|---|
-| GET | `/progress` | user | — | `{ level, xp, xpMax, coins, epoch, streak, cards, combos }` |
+| GET | `/progress` | user | — | `{ level, xp, xpMax, coins, stage, streak, cards, combos }` |
 | GET | `/academy/chapters` | user | — | `{ chapters: ChapterView[] }` |
-| GET | `/academy/chapters/{cardId}` | user | — | `{ cardId, atoms, lessons, progress }` |
-| POST | `/academy/microcheck` | user | `{ cardId, atomId, seed, answer }` | `{ correct, xp, newAtoms }` |
+| GET | `/academy/chapters/{cardId}` | user | — | `{ cardId, skills, lessons, progress }` |
+| POST | `/academy/microcheck` | user | `{ cardId, skillId, seed, answer }` | `{ correct, xp, newSkills }` |
 
 ### 4.7 Sessions
 | Метод | Путь | Auth | Тело | Ответ |
@@ -179,10 +179,10 @@ CRM — это одна страница в браузере, где сисад�
 users(id PK, authKind, email, segment, premium)
   └─ devices(id PK, userId FK, userAgent)
   └─ progress(userId PK, level, xp, coins, riskBudget, streak, ...)
-  └─ cardProgress(userId, cardId, rank, atomsDone[])
+  └─ cardProgress(userId, cardId, rank, skillsDone[])
   └─ comboProgress(userId, comboId, count, unlockedAt)
   └─ enemyProgress(userId, enemyId, stageReached, errorProfile)
-  └─ mistakeScroll(id PK, userId, atom, enemyId, ..., ref template)
+  └─ mistakeScroll(id PK, userId, skillId, enemyId, ..., ref template)
 ```
 
 ### 5.2 Игровые сессии
@@ -217,7 +217,7 @@ configs(version, segment, json, active)
 | Задача | Что делает | Инструменты |
 |---|---|---|
 | **Контент-генерация** | AI генерирует черновики шаблонов встреч | OpenAI API / синтетика |
-| **Автотест** | Проверка полноты: каждый атом покрыт, нет дублей, S3 добавляет домен | `autotest.ts` — бот-тест |
+| **Автотест** | Проверка полноты: каждый навык покрыт, нет дублей, S3 добавляет домен | `autotest.ts` — бот-тест |
 | **Баланс-тюнинг** | Анализ attempts → регрессия на difficulty/success rate | regression + scoring |
 | **Аналитика** | funnels, retention, LTV, cohort analysis | SQL aggregation |
 | **Контент-ревью** | AI оценивает draft templates перед публикацией | LLM-as-judge |

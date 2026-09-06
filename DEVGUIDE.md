@@ -194,8 +194,8 @@ API-контракт (~30 роутов), модель данных, AI-конв�
 - `Downloads/signal-arena-all-prompts-v1.2.zip` — фазовый план, master prompt, phaser shell, UI каталог
 - `Downloads/signal-arena-design-system.zip` — 12 HTML-скринов, design tokens, component contracts (canonical constraints)
 - `Downloads/motion_interaction_catalog_for_all_prompts.md` — 70 микровзаимодействий, 3 MVP-группы, motion tokens
-- `concepts/arenaui-main 3/new.txt` — ТЗ Часть 1 (концепция)
-- `concepts/arenaui-main 3/COMPONENT_CONTRACTS.md` — UI компоненты и их контракты
+- `Downloads/arenaui-main 3/new.txt` — ТЗ Часть 1 (концепция)
+- `Downloads/arenaui-main 3/COMPONENT_CONTRACTS.md` — UI компоненты и их контракты
   - Mobile-first: 390px ширина, hit area ≥ 44×44px
   - Цвет не единственный сигнал состояния
   - Reduced motion fallback для всех анимаций

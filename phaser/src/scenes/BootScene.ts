@@ -1,6 +1,7 @@
 // Загрузка ассетов и заставка.
-// Минимальная загрузка: только фон и базовые иконки.
+// Минимальная загрузка: фон — сплошной тёмно-серый квадрат из палитры.
 // Всё игровое содержимое — в идеях (docs/specs/CONCEPT_IDEAS.md).
+// Ассеты: пока нет — только procedural fallback (тёмно-серый квадрат bgN).
 
 import Phaser from 'phaser';
 import { PALETTE } from '../ui/palette';
@@ -28,7 +29,6 @@ export class BootScene extends Phaser.Scene {
       this.barFill?.fillStyle(p.accentN, 1);
       this.barFill?.fillRoundedRect(GUTTER, barY, Math.max(6, w * v), 6, 3);
     });
-    this.load.image('bg-wall', 'assets/bg-wall.jpg');
   }
 
   create(): void {
@@ -36,10 +36,6 @@ export class BootScene extends Phaser.Scene {
     initMotion();
     const p = PALETTE;
     this.cameras.main.setBackgroundColor(p.bgN);
-    if (this.textures.exists('bg-wall')) {
-      this.add.image(0, 0, 'bg-wall').setOrigin(0).setDisplaySize(CANVAS.w, CANVAS.h).setAlpha(0.5);
-      this.add.rectangle(0, 0, CANVAS.w, CANVAS.h, 0x000000, 0.6).setOrigin(0);
-    }
     this.add
       .text(CANVAS.w / 2, CANVAS.h / 2 - 40, 'Signal Arena', {
         ...TX.display(p, { color: p.accent, align: 'center' }),

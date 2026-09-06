@@ -230,8 +230,7 @@ arena/
   component contracts (mobile-first 390px, hit area ≥44×44px, reduced motion)
 - `Downloads/motion_interaction_catalog_for_all_prompts.md` — каталог
   микровзаимодействий и анимаций (70 событий, 3 MVP-группы)
-- `concepts/signal-arena-all-prompts-v1.2/` — распакованный архив
-- `concepts/arenaui-main 3/new.txt` — детальное ТЗ (Часть 1)
+- `Downloads/arenaui-main 3/new.txt` — детальное ТЗ (Часть 1)
 - `concepts/arenaui-main 3/COMPONENT_CONTRACTS.md` — UI контракты
 
 **Design system важен:** он описывает **canonical constraints**, которые не
