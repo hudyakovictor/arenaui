@@ -30,7 +30,7 @@
 2. **Фронтенд — игровой клиент** на фреймворке **Phaser 4** — реализуется в репозитории
    `phaser/` (TypeScript + Vite, сцены для вертикального цикла + обратной связи,
    механики (см. CONCEPT_IDEAS.md), прогрессия через освоение материала
-   (костыли снимаются по мереду, а не «меняется эпоха»),
+   (костыли снимаются по мереду, а не «смена стадии»),
     а не меняет «этап освоения»), детерминированный движок).
 
 3. **Общий стиль тона текста** утверждён и обязателен для всех текстов игры.
@@ -177,8 +177,8 @@
 | `mobile-game-ux-redesign` | React + Vite + Tailwind | React-прототип |
 | `signal-arena-backend` | Fastify | Серверный код |
 | `signal-arena-client` | **Phaser 4** + Vite | Игровой клиент |
-| `signal-arena-epoch-architecture` | static HTML | Без движка, только markup |
-| `signal-arena-epoch-architecture (1)` | React + Vite + Tailwind | React-прототип |
+| `signal-arena-stage-architecture` | static HTML | Без движка, только markup |
+| `signal-arena-stage-architecture (1)` | React + Vite + Tailwind | React-прототип |
 | `signal-arena-ui-architecture` | static HTML | Без движка, только markup |
 | `using-temporary-phaser-assets` | **Phaser 4** + Vite | Ассеты для Phaser |
 | `дизайн не по тт но многое готово` | React + Vite + Tailwind | React-прототип |

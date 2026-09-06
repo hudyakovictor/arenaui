@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { gameState } from '../state/GameState';
-import { epochOf } from '../config/epochConfig';
-import { renderTopBar, renderBottomNav, navForEpoch, destroyFrom } from '../engine/shell';
+import { stageOf } from '../config/stageConfig';
+import { renderTopBar, renderBottomNav, navForStage, destroyFrom } from '../engine/shell';
 import { enemyById } from '../data/enemies';
 import { cardById } from '../data/cards';
 
@@ -12,7 +12,7 @@ export class ErrorJournalScene extends Phaser.Scene {
   constructor(){ super({ key:'ErrorJournalScene' }); }
   create(){
     const p = gameState.progress;
-    const ep = epochOf(p.level);
+    const ep = stageOf(p.level);
     this.cameras.main.setBackgroundColor(ep.tokens.bg as any);
     renderTopBar(this, gameState);
     this.add.text(14, 68, 'СВИТОК ОШИБОК', { fontFamily:'Inter, system-ui, sans-serif', fontSize:'20px', color:'#E9F2FF' });
@@ -37,7 +37,7 @@ export class ErrorJournalScene extends Phaser.Scene {
       });
       this.add.text(14, 748, 'закрытые записи сгорают — повтор уже был', { fontFamily:'IBM Plex Mono, monospace', fontSize:'8px', color:'#62708A' });
     }
-    renderBottomNav(this, 'MoreScene', navForEpoch(p.level));
+    renderBottomNav(this, 'MoreScene', navForStage(p.level));
   }
   private openEntry(id:string, y:number){
     const e = gameState.progress.errorScroll.find(x=>x.id===id);

@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { gameState } from '../state/GameState';
 import { balanceConfig } from '../config/balanceConfig';
-import { epochOf, getEpochForLevel } from '../config/epochConfig';
+import { stageOf, getStageForLevel } from '../config/stageConfig';
 import { templateFor } from '../data/templates';
 import { mutate } from '../engine/mutator';
 import { scoreEncounter } from '../engine/scoring';
@@ -13,7 +13,7 @@ import type { EncounterInstance, Confidence, SourceId } from '../types';
 import { buildPalette } from '../ui/palette';
 import { destroyFrom } from '../engine/shell';
 
-// Токены — Terminal Design System, меняются эпохой без новой сцены (ТЗ Часть 2 §4)
+// Токены — Terminal Design System, меняются стадийой без новой сцены (ТЗ Часть 2 §4)
 const FONT_UI = { fontFamily: 'Inter, system-ui, sans-serif' };
 const FONT_MONO = { fontFamily: 'IBM Plex Mono, Consolas, monospace' };
 
@@ -29,7 +29,7 @@ export class ArenaScene extends Phaser.Scene {
   private evidenceHighlights = true;
   private uiGroup!: Phaser.GameObjects.Group;
 
-  // Токены эпохи (ТЗ Часть 2): скелет один — взрослеют токены.
+  // Токены стадии (ТЗ Часть 2): скелет один — взрослеют токены.
   private P = buildPalette('street');
   private get COLORS() {
     const P = this.P;
@@ -45,8 +45,8 @@ export class ArenaScene extends Phaser.Scene {
   }
 
   private get progress(){ return gameState.progress; }
-  private get epoch(){ return epochOf(this.progress.level); }
-  private get isStoneEpoch(){ return this.epoch.id==='street'; }
+  private get stage(){ return stageOf(this.progress.level); }
+  private get isStoneStage(){ return this.stage.id==='street'; }
 
   constructor(){ super({ key:'ArenaScene' }); }
 
@@ -72,11 +72,11 @@ export class ArenaScene extends Phaser.Scene {
       this.encounter = mutate(tpl, s.seed);
       this.activeSource = this.encounter.sources[0] as SourceId;
     }
-    this.evidenceHighlights = balanceConfig.evidence.highlightInEpoch[this.progress.epoch as 'street'|'cabinet'|'terminal'|'system'];
+    this.evidenceHighlights = balanceConfig.evidence.highlightInStage[this.progress.stage as 'street'|'cabinet'|'terminal'|'system'];
 
-    this.P = buildPalette(this.epoch.id);
+    this.P = buildPalette(this.stage.id);
     this.cameras.main.setBackgroundColor(this.P.bgN);
-    // Эпоха I «Улица» — согласованный фон: кирпич + виньетка (ui/prototype_style_*.png)
+    // Стадия I «Улица» — согласованный фон: кирпич + виньетка (ui/prototype_style_*.png)
     if (this.P.brick && this.textures.exists('bg-wall')) {
       this.add.image(0, 0, 'bg-wall').setOrigin(0).setDisplaySize(390, 844).setAlpha(0.85);
       this.add.rectangle(0, 0, 390, 844, 0x000000, 0.38).setOrigin(0);
@@ -91,7 +91,7 @@ export class ArenaScene extends Phaser.Scene {
     this.createSkills();
     this.createAnswerBlock();
     this.createBottomNav();
-    this.createDebugEpochSwitcher(); // dev — показать взросление
+    this.createDebugStageSwitcher(); // dev — показать взросление
   }
 
   private pickTemplate(){
@@ -138,9 +138,9 @@ export class ArenaScene extends Phaser.Scene {
     const bColS = p.riskBudget<=20 ? C.badS : p.riskBudget<=45 ? C.warnS : C.goodS;
     this.add.rectangle(298,20,68,24, C.inset).setStrokeStyle(1, bColN).setOrigin(0,0);
     this.add.text(306,32, `⌖ ${p.riskBudget}`, { ...FONT_MONO, fontSize:'10px', color:bColS}).setOrigin(0,0.5);
-    // вторая строка: погода · свиток · стрик · эпоха
+    // вторая строка: погода · свиток · стрик · стадия
     const scroll=p.errorScroll.filter(e=>!e.closed).length;
-    this.add.text(50,50, `УР.${p.level} · ${this.epoch.name} · ⚑ ${p.weather} · ☰ ${scroll} · ×${p.streak}`, { ...FONT_MONO, fontSize:'7px', color:C.mutedS});
+    this.add.text(50,50, `УР.${p.level} · ${this.stage.name} · ⚑ ${p.weather} · ☰ ${scroll} · ×${p.streak}`, { ...FONT_MONO, fontSize:'7px', color:C.mutedS});
   }
 
   private createWeatherStrip(): void {
@@ -148,7 +148,7 @@ export class ArenaScene extends Phaser.Scene {
     const modes: Record<string,string> = { TREND:'ТРЕНД — следуй структуре', FLAT:'ФЛЭТ — жди границ', VOLATILE:'ВОЛАТИЛЬНОСТЬ — размер от ATR', NEWS:'ДЕНЬ НОВОСТЕЙ — факт vs шум', LATE_CYCLE:'ПОЗДНИЙ ЦИКЛ — жадность на пике'};
     this.add.rectangle(0,56,390,18, this.COLORS.surface).setOrigin(0).setStrokeStyle(1, this.COLORS.border);
     this.add.text(14,61, `ПОГОДА: ${modes[this.progress.weather] ?? modes.TREND}`, { ...FONT_MONO, fontSize:'7px', color:this.COLORS.subS});
-    this.add.text(300,61, `${this.epoch.levels[0]}–${this.epoch.levels[1]}`, { ...FONT_MONO, fontSize:'7px', color:this.COLORS.mutedS});
+    this.add.text(300,61, `${this.stage.levels[0]}–${this.stage.levels[1]}`, { ...FONT_MONO, fontSize:'7px', color:this.COLORS.mutedS});
   }
 
   private createQuestion(): void {
@@ -174,7 +174,7 @@ export class ArenaScene extends Phaser.Scene {
     this.add.text(28,144,'?', { ...FONT_MONO, fontSize:'13px', color:this.COLORS.accentS}).setOrigin(0.5);
     this.add.text(50,138,'UNKNOWN THREAT', { ...FONT_MONO, fontSize:'9px', color:this.COLORS.subS});
     this.add.text(50,148,'Враг раскроется после решения · M5', { ...FONT_MONO, fontSize:'7px', color:this.COLORS.mutedS});
-    this.add.text(300,144, this.isStoneEpoch ? 'силуэт 5–8% rim' : 'иконка', { ...FONT_MONO, fontSize:'7px', color:this.COLORS.mutedS});
+    this.add.text(300,144, this.isStoneStage ? 'силуэт 5–8% rim' : 'иконка', { ...FONT_MONO, fontSize:'7px', color:this.COLORS.mutedS});
   }
 
   private createBrowser(): void {
@@ -225,13 +225,13 @@ export class ArenaScene extends Phaser.Scene {
 
   private renderSourcePanel(x:number,y:number,w:number,h:number){
     const sid=this.activeSource;
-    const needEvidenceForEpoch = (balanceConfig.evidence.requiredInEpoch as any)[this.progress.epoch as any] ?? 1;
+    const needEvidenceForStage = (balanceConfig.evidence.requiredInStage as any)[this.progress.stage as any] ?? 1;
     // костыль ярлыков: в Улице все с ярлыками, в Кабинете частично, в Терминале нет, в Системе ложные (ТЗ Часть 2)
-    const crutch = this.epoch.crutches.labels;
+    const crutch = this.stage.crutches.labels;
     const zoneList = this.encounter.mutatedEvidence.filter(z=> z.source===sid);
     if(sid==='chart'){
       this.add.text(x+10,y+6, `${this.encounter.ticker} · ${this.encounter.timeframe} · свечи + объём`, { ...FONT_MONO, fontSize:'8px', color:this.COLORS.subS});
-      // мини-график из прямоугольников (без чисел-подсказок в поздних эпохах)
+      // мини-график из прямоугольников (без чисел-подсказок в поздних стадиях)
       const candles = this.fakeCandles();
       candles.forEach((c,i)=>{
         const cx = x+10 + i*22, cy = y+30;
@@ -326,7 +326,7 @@ export class ArenaScene extends Phaser.Scene {
     } else {
       // прочие источники — заглушка с уликами
       this.add.text(x+10,y+6, sourceById[sid].name + ' — сырые данные', { ...FONT_MONO, fontSize:'8px', color:this.COLORS.subS});
-      this.add.text(x+10,y+24, 'СЫРЫЕ ДАННЫЕ — классифицируй сам (эпоха '+this.epoch.name+')', { ...FONT_MONO, fontSize:'7px', color:this.COLORS.mutedS, wordWrap:{width:w-20}});
+      this.add.text(x+10,y+24, 'СЫРЫЕ ДАННЫЕ — классифицируй сам (стадия '+this.stage.name+')', { ...FONT_MONO, fontSize:'7px', color:this.COLORS.mutedS, wordWrap:{width:w-20}});
       zoneList.forEach((z,i)=>{
         const zzY=y+48+i*18;
         const sel=this.selectedEvidence.has(z.id);
@@ -346,7 +346,7 @@ export class ArenaScene extends Phaser.Scene {
     if(this.selectedEvidence.has(id)) this.selectedEvidence.delete(id);
     else {
       // в Терминале нужно 2 улики из разных источников (M1)
-      const need = (balanceConfig.evidence.requiredInEpoch as any)[this.progress.epoch as any] ?? 1;
+      const need = (balanceConfig.evidence.requiredInStage as any)[this.progress.stage as any] ?? 1;
       if(this.selectedEvidence.size >= need && need>1){
         // позволить заменить
         const first = [...this.selectedEvidence][0]; this.selectedEvidence.delete(first);
@@ -359,7 +359,7 @@ export class ArenaScene extends Phaser.Scene {
     gameState.patchArena({ selectedEvidence: [...this.selectedEvidence] });
     this.refreshEvidenceStrip();
     // обновляем кнопку «К решению» в Улице
-    if(this.isStoneEpoch) this.refreshActionButton();
+    if(this.isStoneStage) this.refreshActionButton();
   }
 
   private createEvidenceStrip(): void {
@@ -367,7 +367,7 @@ export class ArenaScene extends Phaser.Scene {
     this.add.rectangle(14,ey,362,18, this.COLORS.surface).setStrokeStyle(1, this.COLORS.border).setOrigin(0);
     this.add.text(20,ey+5,'УЛИКИ:', { ...FONT_MONO, fontSize:'7px', color:this.COLORS.mutedS});
     this.refreshEvidenceStrip();
-    if(this.isStoneEpoch){
+    if(this.isStoneStage){
       this.add.text(260,ey+5,'нужно минимум 1', { ...FONT_MONO, fontSize:'7px', color:this.COLORS.mutedS});
     }
   }
@@ -397,7 +397,7 @@ export class ArenaScene extends Phaser.Scene {
       const c=cardById[id];
       return { id:c.id, name:c.short, icon:c.icon, domain:c.domain, unlocked: gameState.isCardUnlocked(c.id), rank: gameState.progress.cardRanks[c.id]??0 };
     });
-    const isSequenceMode = this.progress.level >= balanceConfig.sequence.introducedAt && this.encounter.skills.length>=2 && this.epoch.id!=='street';
+    const isSequenceMode = this.progress.level >= balanceConfig.sequence.introducedAt && this.encounter.skills.length>=2 && this.stage.id!=='street';
     const cardW=(362-18)/4;
     skills.forEach((s,i)=>{
       const sx=14+i*(cardW+6), sy=376;
@@ -410,7 +410,7 @@ export class ArenaScene extends Phaser.Scene {
         if(isSequenceMode){
           if(this.selectedSequence.includes(s.id)) this.selectedSequence = this.selectedSequence.filter(x=>x!==s.id);
           else {
-            if(this.selectedSequence.length < ((balanceConfig.sequence.slotsByEpoch as any)[this.progress.epoch as any] ?? 2)) this.selectedSequence.push(s.id);
+            if(this.selectedSequence.length < ((balanceConfig.sequence.slotsInStage as any)[this.progress.stage as any] ?? 2)) this.selectedSequence.push(s.id);
           }
           gameState.patchArena({ selectedSequence: [...this.selectedSequence] });
           this.scene.restart();
@@ -445,8 +445,8 @@ export class ArenaScene extends Phaser.Scene {
       }
     });
     if(isSequenceMode){
-      this.add.text(14,432, `M2 СТЕК: выстрой ${(balanceConfig.sequence.slotsByEpoch as any)[this.progress.epoch as any]} карты по порядку анализа: контекст → уровни → объём → риск`, { ...FONT_MONO, fontSize:'7px', color:this.COLORS.subS, wordWrap:{width:362}});
-      const hasDecoy = this.epoch.id==='system' && balanceConfig.sequence.hasDecoyInSystem;
+      this.add.text(14,432, `M2 СТЕК: выстрой ${(balanceConfig.sequence.slotsInStage as any)[this.progress.stage as any]} карты по порядку анализа: контекст → уровни → объём → риск`, { ...FONT_MONO, fontSize:'7px', color:this.COLORS.subS, wordWrap:{width:362}});
+      const hasDecoy = this.stage.id==='system' && balanceConfig.sequence.hasDecoyInSystem;
       if(hasDecoy) this.add.text(14,444,'+ одна лишняя карта (ловушка)', { ...FONT_MONO, fontSize:'7px', color:this.COLORS.badS});
       // порядок в стеке визуально
       this.add.rectangle(14,452,362,18, this.COLORS.surface).setStrokeStyle(1, this.COLORS.border).setOrigin(0);
@@ -459,7 +459,7 @@ export class ArenaScene extends Phaser.Scene {
 
   private createAnswerBlock(): void {
     const isVerdict = !!this.encounter.verdict && this.progress.level >= balanceConfig.verdict.introducedAt;
-    const isSequence = this.progress.level >= balanceConfig.sequence.introducedAt && this.epoch.id!=='street';
+    const isSequence = this.progress.level >= balanceConfig.sequence.introducedAt && this.stage.id!=='street';
     // M4 вердикт — двухшаговый
     if(isVerdict && !this.verdictFactor){
       this.add.text(14,476,'M4 ВЕРДИКТ КОНФЛИКТА — что доминирует?', { ...FONT_MONO, fontSize:'8px', color:this.COLORS.warnS});
@@ -483,7 +483,7 @@ export class ArenaScene extends Phaser.Scene {
 
     // обычные 4 варианта или стек-подтверждение
     if(isSequence){
-      const canSubmit = this.selectedSequence.length >= (balanceConfig.sequence.slotsByEpoch as any)[this.progress.epoch as any];
+      const canSubmit = this.selectedSequence.length >= (balanceConfig.sequence.slotsInStage as any)[this.progress.stage as any];
       const needEvidence = this.selectedEvidence.size>0;
       this.add.rectangle(14,580,362,42, canSubmit && needEvidence ? this.COLORS.cyan : this.COLORS.elevated).setStrokeStyle(1, canSubmit && needEvidence ? this.COLORS.cyan: this.COLORS.border).setOrigin(0).setInteractive().on('pointerdown', ()=>{
         if(!needEvidence){ this.cameras.main.flash(100,255,89,109); return; }
@@ -544,14 +544,14 @@ export class ArenaScene extends Phaser.Scene {
 
   private submitSequence(){
     // проверяем стек — допустимые порядки из шаблона (упрощено: правильный порядок — по списку skills)
-    const correctOrder = this.encounter.skills.slice(0, (balanceConfig.sequence.slotsByEpoch as any)[this.progress.epoch as any]);
+    const correctOrder = this.encounter.skills.slice(0, (balanceConfig.sequence.slotsInStage as any)[this.progress.stage as any]);
     const isCorrect = this.selectedSequence.length===correctOrder.length && this.selectedSequence.every((v,i)=> v===correctOrder[i]);
     // улика
-    const need = (balanceConfig.evidence.requiredInEpoch as any)[this.progress.epoch as any] ?? 1;
+    const need = (balanceConfig.evidence.requiredInStage as any)[this.progress.stage as any] ?? 1;
     const hasCorrectEvidence = [...this.selectedEvidence].some(id=> this.encounter.mutatedEvidence.find(z=> z.id===id && z.isCorrect));
     const isJustified = hasCorrectEvidence && this.selectedEvidence.size>=need;
     this.showConfidenceAfter(()=>{
-      const verdict = scoreEncounter({ domain: this.encounter.domain, isCorrect, isJustified, confidence: this.confidence, level:this.progress.level, epoch:this.progress.epoch, streak:this.progress.streak});
+      const verdict = scoreEncounter({ domain: this.encounter.domain, isCorrect, isJustified, confidence: this.confidence, level:this.progress.level, stage:this.progress.stage, streak:this.progress.streak});
       this.handleResult(verdict, isCorrect, isJustified);
     });
   }
@@ -577,18 +577,18 @@ export class ArenaScene extends Phaser.Scene {
       const verdictCorrect = this.verdictFactor===this.encounter.verdict.correctFactor;
       if(!verdictCorrect){
         // частичный балл только за верный первый шаг — здесь ошибка первого шага → весь неверно
-        const need = (balanceConfig.evidence.requiredInEpoch as any)[this.progress.epoch as any] ?? 1;
+        const need = (balanceConfig.evidence.requiredInStage as any)[this.progress.stage as any] ?? 1;
         const hasCorrectEvidence = [...this.selectedEvidence].some(id=> this.encounter.mutatedEvidence.find(z=> z.id===id && z.isCorrect));
         const isJustified = hasCorrectEvidence && this.selectedEvidence.size>=need;
-        const verdict = scoreEncounter({ domain: this.encounter.domain, isCorrect:false, isJustified, confidence:this.confidence, level:this.progress.level, epoch:this.progress.epoch, streak:this.progress.streak});
+        const verdict = scoreEncounter({ domain: this.encounter.domain, isCorrect:false, isJustified, confidence:this.confidence, level:this.progress.level, stage:this.progress.stage, streak:this.progress.streak});
         this.handleResult(verdict,false,isJustified);
         return;
       }
     }
-    const need = (balanceConfig.evidence.requiredInEpoch as any)[this.progress.epoch as any] ?? 1;
+    const need = (balanceConfig.evidence.requiredInStage as any)[this.progress.stage as any] ?? 1;
     const hasCorrectEvidence = [...this.selectedEvidence].some(id=> this.encounter.mutatedEvidence.find(z=> z.id===id && z.isCorrect));
     const isJustified = hasCorrectEvidence && this.selectedEvidence.size>=need;
-    const verdict = scoreEncounter({ domain: this.encounter.domain, isCorrect, isJustified, confidence: this.confidence, level:this.progress.level, epoch:this.progress.epoch, streak:this.progress.streak});
+    const verdict = scoreEncounter({ domain: this.encounter.domain, isCorrect, isJustified, confidence: this.confidence, level:this.progress.level, stage:this.progress.stage, streak:this.progress.streak});
     this.handleResult(verdict, isCorrect, isJustified);
   }
 
@@ -655,7 +655,7 @@ export class ArenaScene extends Phaser.Scene {
     const y=250;
     this.add.text(20, y, 'M5 ОПОЗНАНИЕ ВРАГА — кто это был?', { ...FONT_MONO, fontSize:'8px', color:this.COLORS.subS});
     const domain = this.encounter.domain;
-    const opts = enemies.filter(e=> e.domain===domain).slice(0, (balanceConfig.identify.optionsByEpoch as any)[this.progress.epoch as any] ?? 2);
+    const opts = enemies.filter(e=> e.domain===domain).slice(0, (balanceConfig.identify.optionsInStage as any)[this.progress.stage as any] ?? 2);
     if(opts.length===0) opts.push(enemyById[this.encounter.enemyId]);
     // гарантируем что правильный в списке
     if(!opts.find(e=> e.id===this.encounter.enemyId)) opts[0]=enemyById[this.encounter.enemyId];
@@ -721,17 +721,17 @@ export class ArenaScene extends Phaser.Scene {
     this.add.rectangle(20, 520, 350, 44, this.COLORS.cyan).setOrigin(0).setInteractive().on('pointerdown', ()=>{
       destroyFrom(this, overlay); // убираем фидбек целиком, не только фон
       gameState.endArena();       // встреча завершена — следующая получит новый seed
-      // проверка эпохи перехода — событие перерисовки токенов
-      const oldEp = this.epoch.id;
-      const newEp = getEpochForLevel(gameState.progress.level);
+      // проверка стадии перехода — событие перерисовки токенов
+      const oldEp = this.stage.id;
+      const newEp = getStageForLevel(gameState.progress.level);
       if(oldEp!==newEp){
-        this.showEpochTransition(oldEp, newEp);
+        this.showStageTransition(oldEp, newEp);
       } else {
         this.scene.restart();
       }
     });
     this.add.text(195, 542, 'ДАЛЕЕ → РАЗМИНКА', { ...FONT_UI, fontSize:'13px', color:'#03110f'}).setOrigin(0.5);
-    this.add.text(195, 570, 'эпоха взрослеет без новых экранов — только состояния блоков (ТЗ Часть 3)', { ...FONT_MONO, fontSize:'7px', color:this.COLORS.subS}).setOrigin(0.5);
+    this.add.text(195, 570, 'стадия взрослеет без новых экранов — только состояния блоков (ТЗ Часть 3)', { ...FONT_MONO, fontSize:'7px', color:this.COLORS.subS}).setOrigin(0.5);
   }
 
   private showLeviathan(){
@@ -749,18 +749,18 @@ export class ArenaScene extends Phaser.Scene {
     this.add.text(195, 462, 'РАЗОБРАТЬ И ВОССТАНОВИТЬ', { ...FONT_UI, fontSize:'12px', color:this.COLORS.accentS}).setOrigin(0.5);
   }
 
-  private showEpochTransition(from:string, to:string){
+  private showStageTransition(from:string, to:string){
     const overlay=this.add.rectangle(0,0,390,844, this.COLORS.bg, 0.96).setOrigin(0).setInteractive();
     this.add.text(195, 300, 'ЭПОХА СМЕНИЛАСЬ', { ...FONT_MONO, fontSize:'12px', color:this.COLORS.subS}).setOrigin(0.5);
     this.add.text(195, 330, `${from.toUpperCase()}  →  ${to.toUpperCase()}`, { ...FONT_UI, fontSize:'20px', color:this.COLORS.textS}).setOrigin(0.5);
-    this.add.text(195, 360, epochOf(gameState.progress.level).motto, { ...FONT_UI, fontSize:'10px', color:this.COLORS.warnS, align:'center', wordWrap:{width:320}}).setOrigin(0.5);
+    this.add.text(195, 360, stageOf(gameState.progress.level).motto, { ...FONT_UI, fontSize:'10px', color:this.COLORS.warnS, align:'center', wordWrap:{width:320}}).setOrigin(0.5);
     this.add.text(195, 400, 'Скелет один — взрослеют токены, костыли и форма ответа.\nНавигация выросла, ярлыки сняты, «К решению» исчез.', { ...FONT_MONO, fontSize:'8px', color:this.COLORS.mutedS, align:'center', wordWrap:{width:320}}).setOrigin(0.5);
     this.add.rectangle(70, 460, 250, 44, this.COLORS.cyan).setOrigin(0).setInteractive().on('pointerdown', ()=>{ destroyFrom(this, overlay); this.scene.restart(); });
     this.add.text(195,482,'ПРОДОЛЖИТЬ В НОВОЙ ЭПОХЕ', { ...FONT_UI, fontSize:'12px', color:'#03110f'}).setOrigin(0.5);
   }
 
   private createBottomNav(): void {
-    const nav = this.epoch.nav;
+    const nav = this.stage.nav;
     const C=this.COLORS;
     const all = ['ACADEMY','ARENA','COLLECTION','MORE'];
     const ru: Record<string,string> = { ACADEMY:'АКАДЕМИЯ', ARENA:'АРЕНА', COLLECTION:'КОЛЛЕКЦИЯ', MORE:'ЕЩЁ' };
@@ -789,12 +789,12 @@ export class ArenaScene extends Phaser.Scene {
     });
   }
 
-  private createDebugEpochSwitcher(){
+  private createDebugStageSwitcher(){
     // дев-переключатель для демо взросления
     this.add.rectangle(320, 74, 56, 18, this.COLORS.elevated).setStrokeStyle(1, this.COLORS.border).setOrigin(0).setInteractive().on('pointerdown', ()=>{
       // +8 уровней
       gameState.progress.level = Math.min(85, gameState.progress.level+8);
-      gameState.refreshEpoch();
+      gameState.refreshStage();
       gameState.save();
       gameState.endArena(); // уровень сменился — встреча пересобирается
       this.scene.restart();

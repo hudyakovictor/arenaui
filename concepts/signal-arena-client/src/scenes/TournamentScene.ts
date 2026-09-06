@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { gameState } from '../state/GameState';
-import { epochOf } from '../config/epochConfig';
-import { renderTopBar, renderBottomNav, navForEpoch } from '../engine/shell';
+import { stageOf } from '../config/stageConfig';
+import { renderTopBar, renderBottomNav, navForStage } from '../engine/shell';
 
 const W = 390, H = 844;
 
@@ -10,7 +10,7 @@ export class TournamentScene extends Phaser.Scene {
   constructor(){ super({ key:'TournamentScene' }); }
   create(){
     const p = gameState.progress;
-    const ep = epochOf(p.level);
+    const ep = stageOf(p.level);
     this.cameras.main.setBackgroundColor(ep.tokens.bg as any);
     renderTopBar(this, gameState);
     this.add.text(14, 68, 'ТУРНИРЫ', { fontFamily:'Inter, system-ui, sans-serif', fontSize:'20px', color:'#E9F2FF' });
@@ -28,9 +28,9 @@ export class TournamentScene extends Phaser.Scene {
     this.add.text(24, 288, 'Показывается только после ответа — не раскрывает решение.', { fontFamily:'IBM Plex Mono, monospace', fontSize:'8px', color:'#62708A' });
 
     this.add.rectangle(14, 340, 362, 44, 0x31D6C4).setOrigin(0).setInteractive().on('pointerdown', ()=>{
-      this.add.text(195, 400, 'Турниры открываются с эпохи II (Кабинет).\nСейчас — практика ядра.', { fontFamily:'IBM Plex Mono, monospace', fontSize:'10px', color:'#FFB341', align:'center', wordWrap:{width:320} }).setOrigin(0.5,0);
+      this.add.text(195, 400, 'Турниры открываются с стадии II (Кабинет).\nСейчас — практика ядра.', { fontFamily:'IBM Plex Mono, monospace', fontSize:'10px', color:'#FFB341', align:'center', wordWrap:{width:320} }).setOrigin(0.5,0);
     });
     this.add.text(195, 362, 'РЕГИСТРАЦИЯ (ДЕМО)', { fontFamily:'Inter, sans-serif', fontSize:'12px', color:'#03110f' }).setOrigin(0.5);
-    renderBottomNav(this, 'MoreScene', navForEpoch(p.level));
+    renderBottomNav(this, 'MoreScene', navForStage(p.level));
   }
 }

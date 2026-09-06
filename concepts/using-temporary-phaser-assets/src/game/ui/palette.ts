@@ -1,9 +1,9 @@
-// SIGNAL ARENA — токены оформления по эпохам (совместимо с phaser/src/ui/palette.ts).
+// SIGNAL ARENA — токены оформления по стадиям (совместимо с phaser/src/ui/palette.ts).
 
-export type EpochId = 'street' | 'cabinet' | 'terminal' | 'system';
+export type StageId = 'street' | 'cabinet' | 'terminal' | 'system';
 
 export interface Palette {
-  id: EpochId;
+  id: StageId;
   name: string;
   bgN: number; insetN: number; surfaceN: number; elevatedN: number; hoverN: number;
   borderN: number; strongN: number;
@@ -20,7 +20,7 @@ const MONO = 'IBM Plex Mono, Consolas, monospace';
 const UI = 'Inter, system-ui, sans-serif';
 const HEAD = 'Oswald, Inter, system-ui, sans-serif';
 
-export const palettes: Record<EpochId, Palette> = {
+export const palettes: Record<StageId, Palette> = {
   street: {
     id: 'street', name: 'Улица',
     bgN: 0x0a0b0d, insetN: 0x0a0b0d, surfaceN: 0x16181d, elevatedN: 0x1e2126, hoverN: 0x262a31,
@@ -67,10 +67,10 @@ export const palettes: Record<EpochId, Palette> = {
   },
 };
 
-export const EPOCH_ORDER: EpochId[] = ['street', 'cabinet', 'terminal', 'system'];
+export const STAGE_ORDER: StageId[] = ['street', 'cabinet', 'terminal', 'system'];
 
-export function buildPalette(epochId: string): Palette {
-  return palettes[epochId as EpochId] ?? palettes.street;
+export function buildPalette(stageId: string): Palette {
+  return palettes[stageId as StageId] ?? palettes.street;
 }
 
 /** Цвет домена (шесть доменов ТЗ) в токенах палитры. */

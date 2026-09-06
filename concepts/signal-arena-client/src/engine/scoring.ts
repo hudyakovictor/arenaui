@@ -17,7 +17,7 @@ export function scoreEncounter(opts:{
   isJustified: boolean,
   confidence: Confidence,
   level: number,
-  epoch: string,
+  stage: string,
   streak: number
 }): Verdict {
   const cfg = balanceConfig;

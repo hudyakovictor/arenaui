@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { gameState } from '../state/GameState';
-import { epochOf } from '../config/epochConfig';
+import { stageOf } from '../config/stageConfig';
 import { iconKey } from '../engine/assetKeys';
 import { buildPalette } from '../ui/palette';
 
@@ -27,7 +27,7 @@ export class OnboardingScene extends Phaser.Scene {
 
   private showStep(){
     this.children.removeAll(true);
-    const ep = epochOf(1);
+    const ep = stageOf(1);
     this.add.rectangle(0, 0, W, H, 0x070B14).setOrigin(0);
     // бренд
     this.add.text(W/2, 60, 'SIGNAL ARENA', { fontFamily:'Inter, system-ui, sans-serif', fontSize:'26px', color:'#f2f3f5', fontStyle:'italic' }).setOrigin(0.5);

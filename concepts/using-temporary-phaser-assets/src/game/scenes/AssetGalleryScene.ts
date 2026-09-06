@@ -1,5 +1,5 @@
 // Галерея ассетов — экран контроля: каждая иконка в 24px с id, каждый виджет в стандартном размере,
-// свотчи палитры текущей эпохи, журнал подмен. Если здесь всё ровно — в сценах тоже будет ровно.
+// свотчи палитры текущей стадии, журнал подмен. Если здесь всё ровно — в сценах тоже будет ровно.
 import Phaser from 'phaser';
 import { ICONS, type IconGroup } from '../assets/iconSet';
 import { assetLog, icon, enemyAvatar, enemyRender, skillCard } from '../assets/AssetKit';

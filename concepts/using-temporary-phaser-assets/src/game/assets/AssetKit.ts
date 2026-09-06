@@ -64,8 +64,8 @@ export function installLoadGuards(scene: Phaser.Scene): void {
 /* ------------------------------------------------------------------ */
 
 /** Убедиться, что для каждого ключа есть текстура. Вызывать в create() после загрузки. */
-export function ensureAllTextures(scene: Phaser.Scene, epoch: string): void {
-  const p = buildPalette(epoch);
+export function ensureAllTextures(scene: Phaser.Scene, stage: string): void {
+  const p = buildPalette(stage);
   // иконки
   for (const def of ICONS) ensureIcon(scene, def.id);
   // враги: аватар, иконка, рендер S1

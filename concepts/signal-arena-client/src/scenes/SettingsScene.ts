@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { gameState } from '../state/GameState';
-import { epochOf } from '../config/epochConfig';
-import { renderTopBar, renderBottomNav, navForEpoch } from '../engine/shell';
+import { stageOf } from '../config/stageConfig';
+import { renderTopBar, renderBottomNav, navForStage } from '../engine/shell';
 
 const W = 390, H = 844;
 
@@ -14,7 +14,7 @@ export class SettingsScene extends Phaser.Scene {
   constructor(){ super({ key:'SettingsScene' }); }
   create(){
     const p = gameState.progress;
-    const ep = epochOf(p.level);
+    const ep = stageOf(p.level);
     this.cameras.main.setBackgroundColor(ep.tokens.bg as any);
     renderTopBar(this, gameState);
     this.add.text(14, 68, 'НАСТРОЙКИ', { fontFamily:'Inter, system-ui, sans-serif', fontSize:'20px', color:'#E9F2FF' });
@@ -36,7 +36,7 @@ export class SettingsScene extends Phaser.Scene {
     // профиль-данные
     this.add.text(14, 250, 'ДАННЫЕ ПРОФИЛЯ (демо)', { fontFamily:'IBM Plex Mono, monospace', fontSize:'9px', color:'#93A3BC' });
     this.add.text(14, 272, `уровень ${p.level} · XP ${p.xp}/${p.xpMax} · SIG ${p.coins}`, { fontFamily:'IBM Plex Mono, monospace', fontSize:'9px', color:'#E9F2FF' });
-    this.add.text(14, 292, `бюджет ${p.riskBudget}/${p.maxBudget} · стрик ×${p.streak} · эпоха ${p.epoch}`, { fontFamily:'IBM Plex Mono, monospace', fontSize:'9px', color:'#62708A' });
+    this.add.text(14, 292, `бюджет ${p.riskBudget}/${p.maxBudget} · стрик ×${p.streak} · стадия ${p.stage}`, { fontFamily:'IBM Plex Mono, monospace', fontSize:'9px', color:'#62708A' });
 
     // сброс
     this.add.rectangle(14, 340, 362, 48, 0x1A1226).setStrokeStyle(1, 0xFF596D).setOrigin(0).setInteractive().on('pointerdown', ()=>{
@@ -45,6 +45,6 @@ export class SettingsScene extends Phaser.Scene {
     });
     this.add.text(195, 364, 'СБРОСИТЬ ПРОГРЕСС + ПЕРВЫЙ ВХОД', { fontFamily:'IBM Plex Mono, monospace', fontSize:'10px', color:'#FF596D' }).setOrigin(0.5);
     this.add.text(14, 400, 'Сброс вернёт к первому входу и покажет полный юзерфлоу.', { fontFamily:'IBM Plex Mono, monospace', fontSize:'7px', color:'#62708A' });
-    renderBottomNav(this, 'MoreScene', navForEpoch(p.level));
+    renderBottomNav(this, 'MoreScene', navForStage(p.level));
   }
 }

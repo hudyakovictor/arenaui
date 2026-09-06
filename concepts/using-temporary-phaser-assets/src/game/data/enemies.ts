@@ -1,4 +1,4 @@
-// Враги эпохи I «Улица» — компактный набор для проверки интерфейса и первых заданий.
+// Враги стадии I «Улица» — компактный набор для проверки интерфейса и первых заданий.
 export type Domain = 'technical' | 'risk' | 'context' | 'crypto' | 'human' | 'cognitive';
 
 export interface Task {

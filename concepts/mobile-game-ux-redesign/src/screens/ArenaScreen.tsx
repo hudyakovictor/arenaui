@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { EpochDef } from '../theme/epochs';
+import type { StageDef } from '../theme/stages';
 import { buildEncounter, type AnswerDef, type CardDef, type SourceId } from '../data/encounter';
 import { Browser } from '../components/Browser';
 import { TopBar, TaskLine, EvidenceDock } from '../components/Layers';
@@ -15,7 +15,7 @@ export interface PlayerState {
 }
 
 interface Props {
-  epoch: EpochDef;
+  stage: StageDef;
   player: PlayerState;
   round: number;
   onOpenStats: () => void;
@@ -23,9 +23,9 @@ interface Props {
   onNext: () => void;
 }
 
-export function ArenaScreen({ epoch, player, round, onOpenStats, onResult, onNext }: Props) {
-  const st = epoch.structure;
-  const encounter = useMemo(() => buildEncounter(epoch), [epoch, round]);
+export function ArenaScreen({ stage, player, round, onOpenStats, onResult, onNext }: Props) {
+  const st = stage.structure;
+  const encounter = useMemo(() => buildEncounter(stage), [stage, round]);
 
   const [tab, setTab] = useState<SourceId>('chart');
   const [evidence, setEvidence] = useState<Set<string>>(new Set());
@@ -64,7 +64,7 @@ export function ArenaScreen({ epoch, player, round, onOpenStats, onResult, onNex
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else {
-        // в первой эпохе — только одна улика, заменяем
+        // в первой стадийе — только одна улика, заменяем
         if (st.evidenceRequired === 1 && st.stepper) next.clear();
         next.add(id);
       }
@@ -92,7 +92,7 @@ export function ArenaScreen({ epoch, player, round, onOpenStats, onResult, onNex
             ? 'Укажи уверенность'
             : 'Подтвердить решение';
 
-  const ctaHint = !evidenceReady && epoch.index === 1 ? 'Без улики ответ считается угадыванием' : allReady && st.confidence ? `Цена ошибки: −${Math.round(12 * (confidence === 'high' ? 1.6 : confidence === 'low' ? 0.6 : 1))} бюджета` : undefined;
+  const ctaHint = !evidenceReady && stage.index === 1 ? 'Без улики ответ считается угадыванием' : allReady && st.confidence ? `Цена ошибки: −${Math.round(12 * (confidence === 'high' ? 1.6 : confidence === 'low' ? 0.6 : 1))} бюджета` : undefined;
 
   const submit = () => {
     if (!allReady) {
@@ -120,24 +120,24 @@ export function ArenaScreen({ epoch, player, round, onOpenStats, onResult, onNex
 
   return (
     <div className="relative flex min-h-full flex-col">
-      <TopBar epoch={epoch} level={player.level} budget={player.budget} xp={player.xp} sig={player.sig} streak={player.streak} weather={encounter.weather} onOpenStats={onOpenStats} />
-      <TaskLine encounter={encounter} epoch={epoch} step={step} />
+      <TopBar stage={stage} level={player.level} budget={player.budget} xp={player.xp} sig={player.sig} streak={player.streak} weather={encounter.weather} onOpenStats={onOpenStats} />
+      <TaskLine encounter={encounter} stage={stage} step={step} />
 
       <div className="px-4 pt-3">
-        <Browser encounter={encounter} epoch={epoch} activeTab={tab} selected={evidence} blindOpened={blindOpened} locked={!!result} onTab={setTab} onToggleEvidence={toggleEvidence} onOpenBlind={() => setBlindOpened(true)} />
+        <Browser encounter={encounter} stage={stage} activeTab={tab} selected={evidence} blindOpened={blindOpened} locked={!!result} onTab={setTab} onToggleEvidence={toggleEvidence} onOpenBlind={() => setBlindOpened(true)} />
       </div>
 
       <div className={shake ? 'animate-[shake_.35s_ease-in-out]' : ''}>
-        <EvidenceDock encounter={encounter} epoch={epoch} selected={evidence} onRemove={toggleEvidence} />
+        <EvidenceDock encounter={encounter} stage={stage} selected={evidence} onRemove={toggleEvidence} />
       </div>
 
-      {/* Порядок блоков по эпохам: в I карты идут после улик как подсказка,
+      {/* Порядок блоков по стадиям: в I карты идут после улик как подсказка,
           в III–IV карты — это план (стек), поэтому стоят перед ответом. */}
-      <CardRail encounter={encounter} epoch={epoch} active={activeCard} stack={stack} onPick={pickCard} />
+      <CardRail encounter={encounter} stage={stage} active={activeCard} stack={stack} onPick={pickCard} />
 
       {st.verdict && <VerdictRow encounter={encounter} value={verdict} onPick={setVerdict} />}
 
-      <AnswerList encounter={encounter} epoch={epoch} selected={evidence} evidence={evidence} value={answer} onPick={(a) => setAnswer(a.id)} disabled={st.stepper && !evidenceReady} />
+      <AnswerList encounter={encounter} stage={stage} selected={evidence} evidence={evidence} value={answer} onPick={(a) => setAnswer(a.id)} disabled={st.stepper && !evidenceReady} />
 
       {st.confidence && answer !== null && <ConfidenceRow value={confidence} onPick={setConfidence} />}
 
@@ -145,7 +145,7 @@ export function ArenaScreen({ epoch, player, round, onOpenStats, onResult, onNex
         <PrimaryAction label={ctaLabel} hint={ctaHint} ready={allReady} onClick={submit} />
       </div>
 
-      {result && <ResultSheet encounter={encounter} epoch={epoch} result={result} onNext={onNext} />}
+      {result && <ResultSheet encounter={encounter} stage={stage} result={result} onNext={onNext} />}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { balanceConfig } from '../config/balanceConfig';
-import { getEpochForLevel } from '../config/epochConfig';
+import { getStageForLevel } from '../config/stageConfig';
 import type { GameProgress } from '../types';
 import { nextSeed } from '../engine/mutator';
 
@@ -40,7 +40,7 @@ function defaultProgress(): GameProgress {
     level: 4, xp: 680, xpMax: 1000, coins: 1240,
     riskBudget: balanceConfig.riskBudget.initial,
     maxBudget: balanceConfig.riskBudget.max,
-    streak: 2, epoch: getEpochForLevel(4) as any,
+    streak: 2, stage: getStageForLevel(4) as any,
     cardRanks: { C1:1, C2:1, C3:0, C4:1 },
     enemyStagesReached: { E02:1 },
     errorScroll: [],
@@ -57,10 +57,10 @@ export class GameState {
   constructor(){
     const saved = readJson<Partial<GameProgress>>(STORAGE_KEY);
     this.progress = saved ? { ...defaultProgress(), ...saved } : defaultProgress();
-    this.refreshEpoch();
+    this.refreshStage();
   }
-  refreshEpoch(){
-    this.progress.epoch = getEpochForLevel(this.progress.level) as any;
+  refreshStage(){
+    this.progress.stage = getStageForLevel(this.progress.level) as any;
   }
   save(){ writeJson(STORAGE_KEY, this.progress); }
   addXp(v:number){
@@ -69,7 +69,7 @@ export class GameState {
       this.progress.xp -= this.progress.xpMax;
       this.progress.level++;
       this.progress.xpMax = Math.round(this.progress.xpMax*1.4);
-      this.refreshEpoch();
+      this.refreshStage();
     }
     this.save();
   }
@@ -118,7 +118,7 @@ export class GameState {
     try { localStorage.removeItem(ARENA_KEY); } catch {}
   }
 
-  // ── флаги юзерфлоу (онбординг, разминка дня, переход эпохи и т.д.) ──
+  // ── флаги юзерфлоу (онбординг, разминка дня, переход стадии и т.д.) ──
   getFlag(key:string): boolean { return this.getFlagOr(key, false); }
   getFlagOr(key:string, def:boolean): boolean {
     const f = readJson<Record<string, boolean>>(FLAGS_KEY) ?? {};
@@ -134,7 +134,7 @@ export class GameState {
     try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(FLAGS_KEY); localStorage.removeItem(ARENA_KEY); } catch {}
     this.progress = defaultProgress();
     this.encounterSeed = 0;
-    this.refreshEpoch();
+    this.refreshStage();
     this.save();
   }
 }

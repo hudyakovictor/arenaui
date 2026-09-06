@@ -1,10 +1,10 @@
 import Phaser from 'phaser';
 import { gameState } from '../state/GameState';
-import { EPOCH_ORDER, palettes } from '../ui/palette';
+import { STAGE_ORDER, palettes } from '../ui/palette';
 import { ART, CANVAS, CONTENT_W, GUTTER, RADIUS, SP } from '../ui/tokens';
 import * as TX from '../ui/text';
 import { Flow } from '../ui/layout';
-import { renderTopBar, renderBottomNav, renderBackground, navForEpoch, currentPalette, header, transitionTo } from '../ui/shell';
+import { renderTopBar, renderBottomNav, renderBackground, navForStage, currentPalette, header, transitionTo } from '../ui/shell';
 import { listRow, panel, sectionLabel, button } from '../ui/widgets';
 import { assetLog } from '../assets/AssetKit';
 
@@ -17,13 +17,13 @@ export class MoreScene extends Phaser.Scene {
     this.cameras.main.fadeIn(180, 0, 0, 0);
     const flow = new Flow(header(this, 'Ещё', p));
 
-    // Переключатель эпох — проверка цветов одного скелета UI
-    sectionLabel(this, GUTTER, flow.take(16, SP.sm), 'Эпоха оформления (токены)', p);
+    // Переключатель стадий — проверка цветов одного скелета UI
+    sectionLabel(this, GUTTER, flow.take(16, SP.sm), 'Стадия оформления (токены)', p);
     const segH = 48;
     const sy = flow.take(segH);
     panel(this, GUTTER, sy, CONTENT_W, segH, p, { fill: p.insetN });
-    const segW = (CONTENT_W - SP.xs * 2) / EPOCH_ORDER.length;
-    EPOCH_ORDER.forEach((id, i) => {
+    const segW = (CONTENT_W - SP.xs * 2) / STAGE_ORDER.length;
+    STAGE_ORDER.forEach((id, i) => {
       const x = GUTTER + SP.xs + i * segW;
       const active = id === p.id;
       const g = this.add.graphics();
@@ -33,7 +33,7 @@ export class MoreScene extends Phaser.Scene {
       sw.fillCircle(x + segW / 2, sy + 16, 5);
       this.add.text(x + segW / 2, sy + 34, palettes[id].name, TX.caption(p, { color: active ? p.accentInk : p.sub })).setOrigin(0.5);
       const z = this.add.rectangle(x, sy, segW, segH, 0, 0).setOrigin(0).setInteractive();
-      z.on('pointerdown', () => { gameState.setEpoch(id); this.scene.restart(); });
+      z.on('pointerdown', () => { gameState.setStage(id); this.scene.restart(); });
     });
 
     sectionLabel(this, GUTTER, flow.take(16, SP.sm), 'Разделы', p);
@@ -63,6 +63,6 @@ export class MoreScene extends Phaser.Scene {
     void CANVAS;
 
     renderTopBar(this, gameState);
-    renderBottomNav(this, 'MoreScene', navForEpoch());
+    renderBottomNav(this, 'MoreScene', navForStage());
   }
 }

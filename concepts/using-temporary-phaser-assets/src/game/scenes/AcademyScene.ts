@@ -6,7 +6,7 @@ import { domainColor } from '../ui/palette';
 import { ART, CANVAS, CHROME, CONTENT_W, GUTTER, SP } from '../ui/tokens';
 import * as TX from '../ui/text';
 import { Flow } from '../ui/layout';
-import { renderTopBar, renderBottomNav, renderBackground, navForEpoch, currentPalette, header, transitionTo } from '../ui/shell';
+import { renderTopBar, renderBottomNav, renderBackground, navForStage, currentPalette, header, transitionTo } from '../ui/shell';
 import { listRow, panel, sectionLabel, progressBar } from '../ui/widgets';
 import { skillCard } from '../assets/AssetKit';
 
@@ -60,6 +60,6 @@ export class AcademyScene extends Phaser.Scene {
     });
 
     renderTopBar(this, gameState);
-    renderBottomNav(this, 'AcademyScene', navForEpoch());
+    renderBottomNav(this, 'AcademyScene', navForStage());
   }
 }

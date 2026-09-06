@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
-import type { EpochDef, NavId } from '../theme/epochs';
-import { EPOCHS, EPOCH_ORDER } from '../theme/epochs';
+import type { StageDef, NavId } from '../theme/stages';
+import { STAGES, STAGE_ORDER } from '../theme/stages';
 import type { Encounter } from '../data/encounter';
 import { ENEMY_POOL } from '../data/encounter';
 
 /* =====================================================================
-   НИЖНЯЯ НАВИГАЦИЯ — спокойная, растёт по эпохам, без замков-эмодзи.
+   НИЖНЯЯ НАВИГАЦИЯ — спокойная, растёт по стадиям, без замков-эмодзи.
    ===================================================================== */
 
 const NAV_LABEL: Record<NavId, string> = { academy: 'Академия', arena: 'Арена', journal: 'Журнал', collection: 'Коллекция', more: 'Ещё' };
 
-export function BottomNav({ epoch, active, onNav }: { epoch: EpochDef; active: NavId; onNav: (n: NavId) => void }) {
-  const items = epoch.structure.nav;
+export function BottomNav({ stage, active, onNav }: { stage: StageDef; active: NavId; onNav: (n: NavId) => void }) {
+  const items = stage.structure.nav;
   return (
     <nav className="sticky bottom-0 z-20 border-t px-2 pb-[max(8px,env(safe-area-inset-bottom))] pt-1.5" style={{ borderColor: 'var(--border)', background: 'color-mix(in srgb, var(--bg) 92%, transparent)', backdropFilter: 'blur(10px)' }}>
       <div className="flex">
@@ -85,7 +85,7 @@ function NavIcon({ id, active }: { id: NavId; active: boolean }) {
    ЛИСТ СТАТИСТИКИ — всё, что убрали из верхней панели.
    ===================================================================== */
 
-export function StatsSheet({ open, onClose, epoch, level, xp, sig, streak, weather, budget, onSetLevel }: { open: boolean; onClose: () => void; epoch: EpochDef; level: number; xp: number; sig: number; streak: number; weather: string; budget: number; onSetLevel: (l: number) => void }) {
+export function StatsSheet({ open, onClose, stage, level, xp, sig, streak, weather, budget, onSetLevel }: { open: boolean; onClose: () => void; stage: StageDef; level: number; xp: number; sig: number; streak: number; weather: string; budget: number; onSetLevel: (l: number) => void }) {
   if (!open) return null;
   const rows: [string, string][] = [
     ['Опыт', `${xp} XP`],
@@ -100,14 +100,14 @@ export function StatsSheet({ open, onClose, epoch, level, xp, sig, streak, weath
         <div className="mx-auto mb-3 h-1 w-10 rounded-full" style={{ background: 'var(--strong)' }} />
         <div className="mb-3 flex items-baseline justify-between">
           <span className="text-[15px] font-semibold" style={{ color: 'var(--text)' }}>
-            Эпоха {epoch.short} · {epoch.name}
+            Стадия {stage.short} · {stage.name}
           </span>
           <span className="text-[11px]" style={{ color: 'var(--muted)', fontFamily: 'var(--font-mono)' }}>
-            L{epoch.levels[0]}–{epoch.levels[1]}
+            L{stage.levels[0]}–{stage.levels[1]}
           </span>
         </div>
         <p className="mb-3 text-[12px]" style={{ color: 'var(--sub)' }}>
-          {epoch.goal}
+          {stage.goal}
         </p>
         <div className="divide-y rounded-lg border" style={{ borderColor: 'var(--border)' }}>
           {rows.map(([k, v]) => (
@@ -124,9 +124,9 @@ export function StatsSheet({ open, onClose, epoch, level, xp, sig, streak, weath
           </div>
           <input type="range" min={1} max={99} value={level} onChange={(e) => onSetLevel(Number(e.target.value))} className="w-full" style={{ accentColor: 'var(--accent)' }} />
           <div className="mt-2 grid grid-cols-4 gap-1">
-            {EPOCH_ORDER.map((id) => {
-              const e = EPOCHS[id];
-              const cur = e.id === epoch.id;
+            {STAGE_ORDER.map((id) => {
+              const e = STAGES[id];
+              const cur = e.id === stage.id;
               return (
                 <button key={id} onClick={() => onSetLevel(e.levels[0])} className="rounded-md border py-1.5 text-[10px]" style={{ borderColor: cur ? 'var(--accent)' : 'var(--border)', color: cur ? 'var(--text)' : 'var(--sub)', background: cur ? 'var(--elevated)' : 'transparent' }}>
                   {e.short} · {e.name}
@@ -154,12 +154,12 @@ export interface ResultData {
   chosen: string;
 }
 
-export function ResultSheet({ encounter, epoch, result, onNext }: { encounter: Encounter; epoch: EpochDef; result: ResultData; onNext: () => void }) {
+export function ResultSheet({ encounter, stage, result, onNext }: { encounter: Encounter; stage: StageDef; result: ResultData; onNext: () => void }) {
   const [phase, setPhase] = useState<0 | 1 | 2>(0);
   const [played, setPlayed] = useState(0);
   const [identified, setIdentified] = useState<string | null>(null);
   const [typed, setTyped] = useState('');
-  const st = epoch.structure;
+  const st = stage.structure;
 
   useEffect(() => {
     if (played >= 6) return;
@@ -317,7 +317,7 @@ export function ResultSheet({ encounter, epoch, result, onNext }: { encounter: E
    ПЕРЕХОД ЭПОХИ — объясняет, что именно изменится в структуре.
    ===================================================================== */
 
-export function EpochTransition({ from, to, onContinue }: { from: EpochDef; to: EpochDef; onContinue: () => void }) {
+export function StageTransition({ from, to, onContinue }: { from: StageDef; to: StageDef; onContinue: () => void }) {
   const diff: string[] = [];
   if (to.structure.tabs !== from.structure.tabs) diff.push(`Источников в браузере: ${from.structure.tabs} → ${to.structure.tabs}`);
   if (to.structure.evidenceRequired !== from.structure.evidenceRequired) diff.push(`Улик для обоснования: ${from.structure.evidenceRequired} → ${to.structure.evidenceRequired}`);
@@ -331,7 +331,7 @@ export function EpochTransition({ from, to, onContinue }: { from: EpochDef; to: 
   return (
     <div className="absolute inset-0 z-50 flex flex-col justify-center px-6" style={{ background: 'var(--bg)' }}>
       <div className="text-[10px]" style={{ color: 'var(--muted)', fontFamily: 'var(--font-mono)' }}>
-        Эпоха {from.short} завершена
+        Стадия {from.short} завершена
       </div>
       <h2 className="mt-2 text-[28px] font-semibold leading-none" style={{ color: 'var(--text)', fontFamily: 'var(--font-head)' }}>
         {to.short} · {to.name}

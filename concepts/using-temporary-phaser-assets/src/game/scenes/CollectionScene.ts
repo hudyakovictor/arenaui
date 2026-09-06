@@ -5,7 +5,7 @@ import { domainColor } from '../ui/palette';
 import { ART, CANVAS, CONTENT_W, GUTTER, RADIUS, SP } from '../ui/tokens';
 import * as TX from '../ui/text';
 import { Flow } from '../ui/layout';
-import { renderTopBar, renderBottomNav, renderBackground, navForEpoch, currentPalette, header, transitionTo } from '../ui/shell';
+import { renderTopBar, renderBottomNav, renderBackground, navForStage, currentPalette, header, transitionTo } from '../ui/shell';
 import { panel, chip, sectionLabel, tapFeedback } from '../ui/widgets';
 import { enemyAvatar, icon } from '../assets/AssetKit';
 
@@ -62,6 +62,6 @@ export class CollectionScene extends Phaser.Scene {
     void CANVAS;
 
     renderTopBar(this, gameState);
-    renderBottomNav(this, 'CollectionScene', navForEpoch());
+    renderBottomNav(this, 'CollectionScene', navForStage());
   }
 }

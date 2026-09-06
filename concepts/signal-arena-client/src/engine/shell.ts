@@ -1,10 +1,10 @@
 import Phaser from 'phaser';
 import type { GameState } from '../state/GameState';
-import { epochOf } from '../config/epochConfig';
+import { stageOf } from '../config/stageConfig';
 import { iconKey } from './assetKeys';
 
-// Общий скелет интерфейса: Топ-бар + нижняя навигация + эпоха-токены.
-// Один набор компонентов, четыре набора токенов эпох (ТЗ Часть 2 §1).
+// Общий скелет интерфейса: Топ-бар + нижняя навигация + стадия-токены.
+// Один набор компонентов, четыре набора токенов стадий (ТЗ Часть 2 §1).
 
 const W = 390, H = 844;
 const NAV_ITEMS = [
@@ -18,7 +18,7 @@ function hex(n: number): string { return '#' + n.toString(16).padStart(6, '0'); 
 
 export function renderTopBar(scene: Phaser.Scene, gs: GameState): void {
   const p = gs.progress;
-  const ep = epochOf(p.level);
+  const ep = stageOf(p.level);
   const C = {
     bg: 0x111B2E, border: 0x22304A, inset: 0x060A12, surface: 0x0C1323,
     cyan: 0x31D6C4, good: 0x3BDE8A, bad: 0xFF596D, warn: 0xFFB341, muted: 0x62708A,
@@ -40,10 +40,10 @@ export function renderTopBar(scene: Phaser.Scene, gs: GameState): void {
   scene.add.rectangle(bX, 26, bW, 6, C.inset).setStrokeStyle(1, bCol).setOrigin(0, 0.5);
   scene.add.rectangle(bX, 26, Math.round(bW * bPct), 6, bCol).setOrigin(0, 0.5);
   scene.add.text(bX + bW + 6, 26, `${p.riskBudget}`, { fontFamily:'IBM Plex Mono, monospace', fontSize:'10px', color: hex(bCol) }).setOrigin(0, 0.5);
-  // свиток M7 + погода M13 + эпоха
+  // свиток M7 + погода M13 + стадия
   scene.add.text(310, 13, `☰ ${p.errorScroll.filter(e=>!e.closed).length} свиток`, { fontFamily:'IBM Plex Mono, monospace', fontSize:'7px', color: p.errorScroll.filter(e=>!e.closed).length ? '#FFB341' : '#62708A' });
   scene.add.text(310, 24, `⚑ ${p.weather} · ×${p.streak}`, { fontFamily:'IBM Plex Mono, monospace', fontSize:'7px', color:'#93A3BC' });
-  scene.add.text(310, 34, `эпоха ${ep.id}`, { fontFamily:'IBM Plex Mono, monospace', fontSize:'7px', color: ep.tokens.accent });
+  scene.add.text(310, 34, `стадия ${ep.id}`, { fontFamily:'IBM Plex Mono, monospace', fontSize:'7px', color: ep.tokens.accent });
 }
 
 export function renderBottomNav(scene: Phaser.Scene, current: string, unlocked: string[]): void {
@@ -72,7 +72,7 @@ export function renderBottomNav(scene: Phaser.Scene, current: string, unlocked: 
   });
 }
 
-// Навигация, доступная в данную эпоху (ось взросления, ТЗ Часть 2 §2)
+// Навигация, доступная в данную стадийу (ось взросления, ТЗ Часть 2 §2)
 // Модальные слои: сцены добавляют затемнение и затем тексты/кнопки поверх.
 // Удаление одного фона оставляло «осиротевшие» тексты — destroyFrom убирает объект
 // и всё, что было добавлено в display list после него.
@@ -83,8 +83,8 @@ export function destroyFrom(scene: Phaser.Scene, obj: Phaser.GameObjects.GameObj
   [...list.slice(idx)].forEach(o => o.destroy());
 }
 
-export function navForEpoch(level: number): string[] {
-  const ep = epochOf(level).id;
+export function navForStage(level: number): string[] {
+  const ep = stageOf(level).id;
   if (ep === 'street') return ['AcademyScene', 'ArenaScene'];
   if (ep === 'cabinet') return ['AcademyScene', 'ArenaScene', 'CollectionScene'];
   if (ep === 'terminal') return ['AcademyScene', 'ArenaScene', 'CollectionScene', 'MoreScene'];

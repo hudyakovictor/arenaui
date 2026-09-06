@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
 import type { Encounter, SourceId, EvidenceZone } from '../data/encounter';
-import type { EpochDef } from '../theme/epochs';
+import type { StageDef } from '../theme/stages';
 import { cn } from '../utils/cn';
 
-// БРАУЗЕР — стабильный контракт. Не меняется между эпохами, кроме токенов и набора вкладок.
-// props: encounter, epoch, activeTab, selected, blindOpened, onTab, onToggleEvidence, onOpenBlind
+// БРАУЗЕР — стабильный контракт. Не меняется между стадиями, кроме токенов и набора вкладок.
+// props: encounter, stage, activeTab, selected, blindOpened, onTab, onToggleEvidence, onOpenBlind
 
 interface Props {
   encounter: Encounter;
-  epoch: EpochDef;
+  stage: StageDef;
   activeTab: SourceId;
   selected: Set<string>;
   blindOpened: boolean;
@@ -25,8 +25,8 @@ const TAB_NAME: Record<SourceId, string> = {
   position: 'Позиция',
 };
 
-export function Browser({ encounter, epoch, activeTab, selected, blindOpened, locked, onTab, onToggleEvidence, onOpenBlind }: Props) {
-  const st = epoch.structure;
+export function Browser({ encounter, stage, activeTab, selected, blindOpened, locked, onTab, onToggleEvidence, onOpenBlind }: Props) {
+  const st = stage.structure;
   const tabs = encounter.sources;
   const blindIndex = st.blindTab ? tabs.length - 1 : -1;
 
@@ -83,9 +83,9 @@ export function Browser({ encounter, epoch, activeTab, selected, blindOpened, lo
 
       {/* содержимое */}
       <div className="relative" style={{ background: 'var(--surface)', minHeight: 196 }}>
-        {activeTab === 'chart' && <ChartView encounter={encounter} epoch={epoch} selected={selected} locked={locked} onToggle={onToggleEvidence} />}
+        {activeTab === 'chart' && <ChartView encounter={encounter} stage={stage} selected={selected} locked={locked} onToggle={onToggleEvidence} />}
         {activeTab === 'news' && <NewsView encounter={encounter} selected={selected} locked={locked} onToggle={onToggleEvidence} />}
-        {activeTab === 'orderbook' && <OrderbookView encounter={encounter} epoch={epoch} selected={selected} locked={locked} onToggle={onToggleEvidence} />}
+        {activeTab === 'orderbook' && <OrderbookView encounter={encounter} stage={stage} selected={selected} locked={locked} onToggle={onToggleEvidence} />}
         {activeTab === 'position' && <PositionView encounter={encounter} selected={selected} locked={locked} onToggle={onToggleEvidence} />}
       </div>
     </section>
@@ -94,7 +94,7 @@ export function Browser({ encounter, epoch, activeTab, selected, blindOpened, lo
 
 /* ---------- ГРАФИК (внутренняя механика сохранена: свечи + объём + зоны-улики) ---------- */
 
-function ChartView({ encounter, epoch, selected, locked, onToggle }: { encounter: Encounter; epoch: EpochDef; selected: Set<string>; locked?: boolean; onToggle: (id: string) => void }) {
+function ChartView({ encounter, stage, selected, locked, onToggle }: { encounter: Encounter; stage: StageDef; selected: Set<string>; locked?: boolean; onToggle: (id: string) => void }) {
   const { candles } = encounter;
   const W = 362;
   const H = 150;
@@ -114,7 +114,7 @@ function ChartView({ encounter, epoch, selected, locked, onToggle }: { encounter
 
   const y = (p: number) => 8 + ((max - p) / (max - min)) * (H - 16 - VH);
   const zones = encounter.evidence.filter((z) => z.source === 'chart');
-  const hl = epoch.structure.evidenceHighlight;
+  const hl = stage.structure.evidenceHighlight;
 
   return (
     <div className="px-2 pb-2 pt-1">
@@ -180,13 +180,13 @@ function ChartView({ encounter, epoch, selected, locked, onToggle }: { encounter
         })}
       </svg>
       {/* подпись под графиком — зависит от режима ярлыков */}
-      <ChartCaption epoch={epoch} />
+      <ChartCaption stage={stage} />
     </div>
   );
 }
 
-function ChartCaption({ epoch }: { epoch: EpochDef }) {
-  const l = epoch.structure.labels;
+function ChartCaption({ stage }: { stage: StageDef }) {
+  const l = stage.structure.labels;
   const base = 'mt-1 inline-flex items-center gap-1.5 rounded px-2 py-1 text-[10px]';
   const mono = { fontFamily: 'var(--font-mono)' } as const;
   if (l === 'all')
@@ -267,11 +267,11 @@ function NewsView({ encounter, selected, locked, onToggle }: { encounter: Encoun
 
 /* ---------- СТАКАН ---------- */
 
-function OrderbookView({ encounter, epoch, selected, locked, onToggle }: { encounter: Encounter; epoch: EpochDef; selected: Set<string>; locked?: boolean; onToggle: (id: string) => void }) {
+function OrderbookView({ encounter, stage, selected, locked, onToggle }: { encounter: Encounter; stage: StageDef; selected: Set<string>; locked?: boolean; onToggle: (id: string) => void }) {
   const bids = [0.82, 1.4, 0.6, 0.35, 0.2];
   const asks = [0.9, 0.4, 0.3, 0.25, 0.15];
   const zone = encounter.evidence.find((z) => z.source === 'orderbook')!;
-  const dense = epoch.index === 4;
+  const dense = stage.index === 4;
   return (
     <div className="p-3">
       <div className="grid grid-cols-2 gap-2 text-[10px]" style={{ fontFamily: 'var(--font-mono)' }}>

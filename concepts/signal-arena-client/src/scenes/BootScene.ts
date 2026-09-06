@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { gameState } from '../state/GameState';
-import { epochOf } from '../config/epochConfig';
+import { stageOf } from '../config/stageConfig';
 import { enemies } from '../data/enemies';
 import { cards } from '../data/cards';
 import {
@@ -35,7 +35,7 @@ export class BootScene extends Phaser.Scene {
     for (const m of MENU_ICONS) {
       this.load.svg(iconKey(m.id), iconUrl(m.id), { width: 24, height: 24 });
     }
-    // фон эпохи I «Улица» — согласованный кирпич (ui/prototype_style_*.png)
+    // фон стадии I «Улица» — согласованный кирпич (ui/prototype_style_*.png)
     this.load.image('bg-wall', 'assets/bg-wall.jpg');
   }
 
@@ -47,10 +47,10 @@ export class BootScene extends Phaser.Scene {
     this.registry.set('xpMax', p.xpMax);
     this.registry.set('coins', p.coins);
     this.registry.set('riskBudget', p.riskBudget);
-    this.registry.set('epoch', p.epoch);
+    this.registry.set('stage', p.stage);
 
-    // короткая заставка эпохи — токены меняются без новой сцены (ТЗ Часть 2 §4)
-    const ep = epochOf(p.level);
+    // короткая заставка стадии — токены меняются без новой сцены (ТЗ Часть 2 §4)
+    const ep = stageOf(p.level);
     this.cameras.main.setBackgroundColor(ep.tokens.bg);
     if (this.textures.exists('bg-wall')) {
       this.add.image(0, 0, 'bg-wall').setOrigin(0).setDisplaySize(390, 844).setAlpha(0.5);

@@ -12,7 +12,7 @@ export class BootScene extends Phaser.Scene {
   constructor() { super({ key: 'BootScene' }); }
 
   preload(): void {
-    const p = buildPalette(gameState.progress.epoch);
+    const p = buildPalette(gameState.progress.stage);
     this.cameras.main.setBackgroundColor(p.bgN);
     const w = CANVAS.w - GUTTER * 2;
     const barY = CANVAS.h / 2 + 60;
@@ -34,7 +34,7 @@ export class BootScene extends Phaser.Scene {
 
   create(): void {
     // Всё, что не загрузилось, — заменяется процедурной заглушкой нужного размера.
-    ensureAllTextures(this, gameState.progress.epoch);
+    ensureAllTextures(this, gameState.progress.stage);
     this.time.delayedCall(400, () => this.scene.start('ArenaScene'));
   }
 }

@@ -1,6 +1,6 @@
-// SIGNAL ARENA — токены оформления по эпохам (ТЗ Часть 2 «Эпохи»).
-// Один скелет UI во всех эпохах; различаются только токены.
-// Эпоха I «Улица» — согласованный визуал: граффити, кислотный неон, кирпич (ui/prototype_style_*.png).
+// SIGNAL ARENA — токены оформления по стадиям (ТЗ Часть 2 «Стадии»).
+// Один скелет UI во всех стадиях; различаются только токены.
+// Стадия I «Улица» — согласованный визуал: граффити, кислотный неон, кирпич (ui/prototype_style_*.png).
 export interface Palette {
   bgN: number; insetN: number; surfaceN: number; elevatedN: number; hoverN: number;
   borderN: number; strongN: number;
@@ -19,7 +19,7 @@ const UI = 'Inter, system-ui, sans-serif';
 const HEAD = 'Oswald, Inter, system-ui, sans-serif';
 
 export const palettes: Record<string, Palette> = {
-  // Эпоха I «УЛИЦА» L1–20: граффити, неон, эмоция (согласованный стиль)
+  // Стадия I «УЛИЦА» L1–20: граффити, неон, эмоция (согласованный стиль)
   street: {
     bgN: 0x0a0b0d, insetN: 0x0a0b0d, surfaceN: 0x16181d, elevatedN: 0x1e2126, hoverN: 0x262a31,
     borderN: 0x33383f, strongN: 0x454b55,
@@ -31,7 +31,7 @@ export const palettes: Record<string, Palette> = {
     fontHead: HEAD, fontUi: UI, fontMono: MONO,
     brick: true,
   },
-  // Эпоха II «КАБИНЕТ» L21–50: чистые панели, пастель
+  // Стадия II «КАБИНЕТ» L21–50: чистые панели, пастель
   cabinet: {
     bgN: 0x080e1e, insetN: 0x060a12, surfaceN: 0x0f1b32, elevatedN: 0x14233f, hoverN: 0x1a2c4c,
     borderN: 0x2a3a55, strongN: 0x3d527a,
@@ -43,7 +43,7 @@ export const palettes: Record<string, Palette> = {
     fontHead: UI, fontUi: UI, fontMono: MONO,
     brick: false,
   },
-  // Эпоха III «ТЕРМИНАЛ» L51–80: плотный монохром, данные
+  // Стадия III «ТЕРМИНАЛ» L51–80: плотный монохром, данные
   terminal: {
     bgN: 0x060a12, insetN: 0x060a12, surfaceN: 0x0c1323, elevatedN: 0x111b2e, hoverN: 0x14223a,
     borderN: 0x22304a, strongN: 0x344563,
@@ -55,7 +55,7 @@ export const palettes: Record<string, Palette> = {
     fontHead: MONO, fontUi: UI, fontMono: MONO,
     brick: false,
   },
-  // Эпоха IV «СИСТЕМА» L81–99: минимализм, белое на тёмном
+  // Стадия IV «СИСТЕМА» L81–99: минимализм, белое на тёмном
   system: {
     bgN: 0x05070d, insetN: 0x05070d, surfaceN: 0x0a0f1c, elevatedN: 0x0e1526, hoverN: 0x121a2e,
     borderN: 0x1a2740, strongN: 0x27395c,
@@ -69,6 +69,6 @@ export const palettes: Record<string, Palette> = {
   },
 };
 
-export function buildPalette(epochId: string): Palette {
-  return palettes[epochId] ?? palettes.street;
+export function buildPalette(stageId: string): Palette {
+  return palettes[stageId] ?? palettes.street;
 }

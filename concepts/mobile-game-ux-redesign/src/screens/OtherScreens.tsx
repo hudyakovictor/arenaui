@@ -1,4 +1,4 @@
-import type { EpochDef } from '../theme/epochs';
+import type { StageDef } from '../theme/stages';
 import type { PlayerState } from './ArenaScreen';
 
 function Screen({ title, sub, children }: { title: string; sub: string; children: React.ReactNode }) {
@@ -40,16 +40,16 @@ function Primary({ label, onClick }: { label: string; onClick?: () => void }) {
 }
 
 /* АКАДЕМИЯ — одна тема «на сегодня», остальное списком. Карта = мост в Арену. */
-export function AcademyScreen({ epoch, onGoArena }: { epoch: EpochDef; onGoArena: () => void }) {
+export function AcademyScreen({ stage, onGoArena }: { stage: StageDef; onGoArena: () => void }) {
   const lessons = [
     { id: 'L1', t: 'Объём подтверждает движение', done: true },
-    { id: 'L2', t: 'Источник важнее заголовка', done: epoch.index >= 2 },
-    { id: 'L3', t: 'Стоп считается до входа', done: epoch.index >= 3 },
+    { id: 'L2', t: 'Источник важнее заголовка', done: stage.index >= 2 },
+    { id: 'L3', t: 'Стоп считается до входа', done: stage.index >= 3 },
     { id: 'L4', t: 'Стакан: стены и пустоты', done: false },
   ];
   const current = lessons.find((l) => !l.done) ?? lessons[0];
   return (
-    <Screen title="Академия" sub={`Эпоха ${epoch.short} · ${epoch.goal}`}>
+    <Screen title="Академия" sub={`Стадия ${stage.short} · ${stage.goal}`}>
       <Card accent>
         <Label>Урок дня · 4 минуты</Label>
         <div className="mt-1 text-[15px] font-medium" style={{ color: 'var(--text)' }}>
@@ -60,7 +60,7 @@ export function AcademyScreen({ epoch, onGoArena }: { epoch: EpochDef; onGoArena
         </p>
         <Primary label="Начать урок" onClick={onGoArena} />
       </Card>
-      <Label>Программа эпохи</Label>
+      <Label>Программа стадии</Label>
       <div className="divide-y rounded-xl border" style={{ borderColor: 'var(--border)', background: 'var(--surface)', borderRadius: 'var(--radius)' }}>
         {lessons.map((l) => (
           <div key={l.id} className="flex items-center gap-3 px-3 py-2.5" style={{ borderColor: 'var(--border)' }}>
@@ -81,10 +81,10 @@ export function AcademyScreen({ epoch, onGoArena }: { epoch: EpochDef; onGoArena
 }
 
 /* ЖУРНАЛ — свиток ошибок как список «долгов», закрываемых в Арене. */
-export function JournalScreen({ epoch, onGoArena }: { epoch: EpochDef; onGoArena: () => void }) {
+export function JournalScreen({ stage, onGoArena }: { stage: StageDef; onGoArena: () => void }) {
   const errors = [
     { enemy: 'FOMO-Шептун', atom: 'C2.3 · объём', evidence: 'нет улики', open: true },
-    { enemy: 'Ложный пробой', atom: 'T1.4 · ретест', evidence: 'ev-break', open: epoch.index <= 2 },
+    { enemy: 'Ложный пробой', atom: 'T1.4 · ретест', evidence: 'ev-break', open: stage.index <= 2 },
     { enemy: 'Плечо-соблазн', atom: 'R3.1 · размер', evidence: 'ev-risk', open: false },
   ];
   const open = errors.filter((e) => e.open).length;
@@ -143,14 +143,14 @@ export function JournalScreen({ epoch, onGoArena }: { epoch: EpochDef; onGoArena
 }
 
 /* КОЛЛЕКЦИЯ — враги как трофеи со стадиями; силуэт до победы. */
-export function CollectionScreen({ epoch }: { epoch: EpochDef }) {
+export function CollectionScreen({ stage }: { stage: StageDef }) {
   const enemies = [
-    { id: 'E05', name: 'FOMO-Шептун', stage: Math.min(epoch.index, 3), max: 3 },
-    { id: 'E02', name: 'Ложный пробой', stage: epoch.index >= 2 ? 1 : 0, max: 3 },
-    { id: 'E11', name: 'Кит-фантом', stage: epoch.index >= 3 ? 2 : 0, max: 4 },
+    { id: 'E05', name: 'FOMO-Шептун', stage: Math.min(stage.index, 3), max: 3 },
+    { id: 'E02', name: 'Ложный пробой', stage: stage.index >= 2 ? 1 : 0, max: 3 },
+    { id: 'E11', name: 'Кит-фантом', stage: stage.index >= 3 ? 2 : 0, max: 4 },
     { id: 'E08', name: 'Плечо-соблазн', stage: 0, max: 3 },
     { id: 'E31', name: 'Левиафан', stage: 0, max: 1 },
-    { id: 'E14', name: 'Ложный ярлык', stage: epoch.index >= 4 ? 1 : 0, max: 3 },
+    { id: 'E14', name: 'Ложный ярлык', stage: stage.index >= 4 ? 1 : 0, max: 3 },
   ];
   return (
     <Screen title="Коллекция" sub="Враг раскрывается по стадиям. До первой победы — силуэт.">
@@ -182,10 +182,10 @@ export function CollectionScreen({ epoch }: { epoch: EpochDef }) {
 }
 
 /* ЕЩЁ — настройки, турниры, магазин: плоский список без визуального веса. */
-export function MoreScreen({ epoch, player }: { epoch: EpochDef; player: PlayerState }) {
+export function MoreScreen({ stage, player }: { stage: StageDef; player: PlayerState }) {
   const items = [
-    { t: 'Турниры', s: epoch.index >= 3 ? 'Открыты · сезон 2' : 'Откроются в эпохе III', on: epoch.index >= 3 },
-    { t: 'Магазин', s: epoch.index >= 4 ? `${player.sig} SIG` : 'Откроется в эпохе IV', on: epoch.index >= 4 },
+    { t: 'Турниры', s: stage.index >= 3 ? 'Открыты · сезон 2' : 'Откроются в стадийе III', on: stage.index >= 3 },
+    { t: 'Магазин', s: stage.index >= 4 ? `${player.sig} SIG` : 'Откроется в стадийе IV', on: stage.index >= 4 },
     { t: 'Ежедневная разминка', s: '3 встречи · +8 XP', on: true },
     { t: 'Настройки', s: 'Звук, вибрация, размер текста', on: true },
     { t: 'О проекте', s: 'Signal Arena · v2', on: true },

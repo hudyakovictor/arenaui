@@ -845,8 +845,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "epoch": {
-          "name": "epoch",
+        "stage": {
+          "name": "stage",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -1047,8 +1047,8 @@
           "autoincrement": false,
           "default": 0
         },
-        "epoch": {
-          "name": "epoch",
+        "stage": {
+          "name": "stage",
           "type": "text",
           "primaryKey": false,
           "notNull": true,

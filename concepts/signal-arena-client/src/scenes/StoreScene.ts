@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { gameState } from '../state/GameState';
-import { epochOf } from '../config/epochConfig';
-import { renderTopBar, renderBottomNav, navForEpoch } from '../engine/shell';
+import { stageOf } from '../config/stageConfig';
+import { renderTopBar, renderBottomNav, navForStage } from '../engine/shell';
 import { iconKey } from '../engine/assetKeys';
 
 const W = 390, H = 844;
@@ -11,7 +11,7 @@ export class StoreScene extends Phaser.Scene {
   constructor(){ super({ key:'StoreScene' }); }
   create(){
     const p = gameState.progress;
-    const ep = epochOf(p.level);
+    const ep = stageOf(p.level);
     this.cameras.main.setBackgroundColor(ep.tokens.bg as any);
     renderTopBar(this, gameState);
     this.add.text(14, 68, 'МАРКЕТ КОСМЕТИКИ', { fontFamily:'Inter, system-ui, sans-serif', fontSize:'20px', color:'#E9F2FF' });
@@ -35,7 +35,7 @@ export class StoreScene extends Phaser.Scene {
       this.add.text(344, y+39, 'КУПИТЬ', { fontFamily:'IBM Plex Mono, monospace', fontSize:'8px', color:'#3BDE8A' }).setOrigin(0.5);
     });
     this.add.text(14, 476, 'Только косметика. Ничто из магазина не меняет данные, карты, ответы или бюджет.', { fontFamily:'IBM Plex Mono, monospace', fontSize:'7px', color:'#62708A', wordWrap:{width:340} });
-    renderBottomNav(this, 'MoreScene', navForEpoch(p.level));
+    renderBottomNav(this, 'MoreScene', navForStage(p.level));
   }
   private buy(name:string, price:number){
     const p = gameState.progress;

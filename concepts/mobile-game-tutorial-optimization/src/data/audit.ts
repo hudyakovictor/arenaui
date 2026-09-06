@@ -90,7 +90,7 @@ export const findings: Finding[] = [
     id: "C1", cat: "copy", severity: "critical", gain: 4, effort: "M", sprint: 1,
     title: "Внутренние метки спецификации показаны игроку",
     evidence: "«M1: выбери улику», «M3 СТАВКА УВЕРЕННОСТИ», «M5 ОПОЗНАНИЕ ВРАГА», «M14 ТЕНЬ АРЕНЫ», «ТЗ Часть 3», «Component Contract», «силуэт 5–8% rim», «атомы C2.3» — это язык документации, а не игры.",
-    code: "'эпоха взрослеет без новых экранов — только состояния блоков (ТЗ Часть 3)'",
+    code: "'стадия взрослеет без новых экранов — только состояния блоков (ТЗ Часть 3)'",
     fix: "Все строки — в `i18n/ru.json` с человеческими формулировками по стиль_тон.txt. Метки M1–M15 остаются только в комментариях кода и телеметрии.",
   },
   {
@@ -116,13 +116,13 @@ export const findings: Finding[] = [
   {
     id: "A2", cat: "arch", severity: "high", gain: 2.5, effort: "M", sprint: 2,
     title: "Любое изменение состояния = scene.restart()",
-    evidence: "После ответа, смены эпохи, Левиафана вызывается полный перезапуск сцены — мигание, потеря контекста, невозможность анимировать переход.",
+    evidence: "После ответа, смены стадии, Левиафана вызывается полный перезапуск сцены — мигание, потеря контекста, невозможность анимировать переход.",
     fix: "Реактивный стор (Zustand vanilla, как в ТЗ) + подписки компонентов через `subscribe(selector)`. Меняется только затронутый блок.",
   },
   {
     id: "A3", cat: "arch", severity: "high", gain: 1, effort: "S", sprint: 1,
     title: "Dev-инструменты и мёртвый код в продакшене",
-    evidence: "Кнопка «LVL+8» (createDebugEpochSwitcher) видна игроку; `refreshActionButton()` — пустой метод с комментарием; `comboId` считается и выбрасывается.",
+    evidence: "Кнопка «LVL+8» (createDebugStageSwitcher) видна игроку; `refreshActionButton()` — пустой метод с комментарием; `comboId` считается и выбрасывается.",
     code: "private refreshActionButton(){ const need = …; const btnY=700; // будет нижняя кнопка }",
     fix: "Dev-панель только под `import.meta.env.DEV`, удалить мёртвые ветки, включить `noUnusedLocals` в tsconfig.",
   },
@@ -171,7 +171,7 @@ export const findings: Finding[] = [
     id: "AN3", cat: "anim", severity: "medium", gain: 1, effort: "S", sprint: 4,
     title: "Нет звука и haptics",
     evidence: "Phaser Sound заявлен в ТЗ, но в проекте нет ни одного аудиофайла и вызова `navigator.vibrate`.",
-    fix: "5 базовых SFX (tap, верно, неверно, награда, смена эпохи) + вибрация 10/30ms. Тумблер в настройках.",
+    fix: "5 базовых SFX (tap, верно, неверно, награда, смена стадии) + вибрация 10/30ms. Тумблер в настройках.",
   },
 
   // ─── Стек ───
@@ -239,8 +239,8 @@ export const findings: Finding[] = [
   {
     id: "Q2", cat: "qa", severity: "high", gain: 1.5, effort: "S", sprint: 1,
     title: "Типизация обходится через `as any`",
-    evidence: "`(balanceConfig.sequence.slotsByEpoch as any)[this.progress.epoch as any]` — компилятор отключён в самых важных местах баланса.",
-    fix: "`strict: true`, тип `EpochId = 'street'|'cabinet'|'terminal'|'system'`, `Record<EpochId, number>` в конфиге. Ноль `any` в src/.",
+    evidence: "`(balanceConfig.sequence.slotsInStage as any)[this.progress.stage as any]` — компилятор отключён в самых важных местах баланса.",
+    fix: "`strict: true`, тип `StageId = 'street'|'cabinet'|'terminal'|'system'`, `Record<StageId, number>` в конфиге. Ноль `any` в src/.",
   },
 
   // ─── Безопасность ───
@@ -278,7 +278,7 @@ export const copyBeforeAfter = [
   { before: "M5 ОПОЗНАНИЕ ВРАГА — кто это был?", after: "Кто тебя ждал на этом графике?" },
   { before: "UNKNOWN THREAT · Враг раскроется после решения · M5", after: "Неизвестный противник — раскроется после твоего решения" },
   { before: "M14 ТЕНЬ АРЕНЫ — как ответили другие", after: "Как решили другие игроки" },
-  { before: "эпоха взрослеет без новых экранов — только состояния блоков (ТЗ Часть 3)", after: "Новая эпоха. Подсказок меньше — доверия к тебе больше." },
+  { before: "стадия взрослеет без новых экранов — только состояния блоков (ТЗ Часть 3)", after: "Новая стадия. Подсказок меньше — доверия к тебе больше." },
   { before: "BUDGET = 0 · DRAWDOWN LEVIATHAN · СБЫТИЕ С БЮДЖЕТОМ", after: "Бюджет риска исчерпан. Разберём, где ушли деньги — и вернём 40 в запас." },
   { before: "силуэт 5–8% rim", after: "(удалить — это заметка для художника)" },
 ];
@@ -328,7 +328,7 @@ export const sprints: Sprint[] = [
 ];
 
 export const dodChecklist = [
-  { group: "Читаемость", items: ["Ни одного текста < 12px", "Контраст ≥ 4.5:1 на всех эпохах", "Моно только для чисел"] },
+  { group: "Читаемость", items: ["Ни одного текста < 12px", "Контраст ≥ 4.5:1 на всех стадиях", "Моно только для чисел"] },
   { group: "Тач", items: ["Все интерактивы ≥ 44×44", "Safe-area учтена", "Нет леттербоксинга на 20:9"] },
   { group: "Тексты", items: ["0 строк с M1–M15 / ТЗ", "Единая локаль экрана", "cspell зелёный"] },
   { group: "Код", items: ["Файл ≤ 300 строк", "0 any, strict: true", "Prettier/ESLint в pre-commit"] },

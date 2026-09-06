@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { gameState } from '../state/GameState';
-import { epochOf } from '../config/epochConfig';
-import { renderTopBar, renderBottomNav, navForEpoch } from '../engine/shell';
+import { stageOf } from '../config/stageConfig';
+import { renderTopBar, renderBottomNav, navForStage } from '../engine/shell';
 import { cards, cardById } from '../data/cards';
 import { enemies } from '../data/enemies';
 
@@ -12,7 +12,7 @@ export class MasteryCheckScene extends Phaser.Scene {
   constructor(){ super({ key:'MasteryCheckScene' }); }
   create(){
     const p = gameState.progress;
-    const ep = epochOf(p.level);
+    const ep = stageOf(p.level);
     this.cameras.main.setBackgroundColor(ep.tokens.bg as any);
     renderTopBar(this, gameState);
     this.add.text(14, 68, 'МАСТЕР-ЧЕК', { fontFamily:'Inter, system-ui, sans-serif', fontSize:'20px', color:'#E9F2FF' });
@@ -50,6 +50,6 @@ export class MasteryCheckScene extends Phaser.Scene {
       this.add.text(195, 620, 'Экзамен — это задание Арены с полным раскрытием.\nПрактика → Мастер-чек.', { fontFamily:'IBM Plex Mono, monospace', fontSize:'10px', color:'#FFB341', align:'center', wordWrap:{width:320} }).setOrigin(0.5,0);
     });
     this.add.text(195, 582, 'К ЭКЗАМЕНУ → ПРАКТИКА', { fontFamily:'Inter, sans-serif', fontSize:'12px', color:'#03110f' }).setOrigin(0.5);
-    renderBottomNav(this, 'MoreScene', navForEpoch(p.level));
+    renderBottomNav(this, 'MoreScene', navForStage(p.level));
   }
 }

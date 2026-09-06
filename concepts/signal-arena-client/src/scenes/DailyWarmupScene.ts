@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { gameState } from '../state/GameState';
-import { epochOf } from '../config/epochConfig';
-import { renderTopBar, renderBottomNav, navForEpoch } from '../engine/shell';
+import { stageOf } from '../config/stageConfig';
+import { renderTopBar, renderBottomNav, navForStage } from '../engine/shell';
 
 const W = 390, H = 844;
 const WMODES: Record<string,string> = { TREND:'ТРЕНД — следуй структуре', FLAT:'ФЛЭТ — жди границ', VOLATILE:'ВОЛАТИЛЬНОСТЬ — размер от ATR', NEWS:'ДЕНЬ НОВОСТЕЙ — факт vs шум', LATE_CYCLE:'ПОЗДНИЙ ЦИКЛ — жадность на пике' };
@@ -11,7 +11,7 @@ export class DailyWarmupScene extends Phaser.Scene {
   constructor(){ super({ key:'DailyWarmupScene' }); }
   create(){
     const p = gameState.progress;
-    const ep = epochOf(p.level);
+    const ep = stageOf(p.level);
     this.cameras.main.setBackgroundColor(ep.tokens.bg as any);
     renderTopBar(this, gameState);
     this.add.text(14, 68, 'РАЗМИНКА ДНЯ', { fontFamily:'Inter, system-ui, sans-serif', fontSize:'20px', color:'#E9F2FF' });
@@ -41,6 +41,6 @@ export class DailyWarmupScene extends Phaser.Scene {
     });
     this.add.text(195, 412, 'НАЧАТЬ РАЗМИНКУ →', { fontFamily:'Inter, sans-serif', fontSize:'12px', color:'#03110f' }).setOrigin(0.5);
     this.add.text(14, 448, 'От простого к сложному, всегда в новых сценариях.\nРазминка не копирует прошлые задания.', { fontFamily:'IBM Plex Mono, monospace', fontSize:'8px', color:'#62708A', wordWrap:{width:340} });
-    renderBottomNav(this, 'MoreScene', navForEpoch(p.level));
+    renderBottomNav(this, 'MoreScene', navForStage(p.level));
   }
 }

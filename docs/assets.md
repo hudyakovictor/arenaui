@@ -21,7 +21,7 @@
 | `render/cards/C1–C17.svg` | SVG | Карты-события и `Cwait.svg` |
 | `render/icons/dom-*.svg` | SVG | Иконки доменов (technical, risk, crypto, cognitive, human, context) |
 | `render/icons/nav-*.svg` | SVG | Иконки навигации (academy, arena, collection, more) |
-| `bg-wall.jpg` | JPG | Фон эпохи «Улица» |
+| `bg-wall.jpg` | JPG | Фон (уровни 1–20) |
 | `manifest.json` | JSON | Метаданные: ID, имя, домен, уровни, пути к файлам |
 | `icon-index.json` | JSON | Индекс иконок с локализованными подписями |
 

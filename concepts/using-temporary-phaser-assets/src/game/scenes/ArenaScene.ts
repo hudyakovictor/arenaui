@@ -6,7 +6,7 @@ import { domainColor } from '../ui/palette';
 import { ART, CANVAS, CHROME, CONTENT_W, GUTTER, RADIUS, SP } from '../ui/tokens';
 import * as TX from '../ui/text';
 import { Flow } from '../ui/layout';
-import { renderTopBar, renderBottomNav, renderBackground, navForEpoch, bottomNavHeight, currentPalette } from '../ui/shell';
+import { renderTopBar, renderBottomNav, renderBackground, navForStage, bottomNavHeight, currentPalette } from '../ui/shell';
 import { panel, chip, button, answerRow, sectionLabel } from '../ui/widgets';
 import { enemyRender, icon } from '../assets/AssetKit';
 import { drawCandleChart, genCandles } from '../ui/CandleChart';
@@ -34,7 +34,7 @@ export class ArenaScene extends Phaser.Scene {
     this.body = this.add.container(0, 0);
     this.renderPhase();
     renderTopBar(this, gameState);
-    renderBottomNav(this, 'ArenaScene', navForEpoch());
+    renderBottomNav(this, 'ArenaScene', navForStage());
   }
 
   private rebuild(): void {
@@ -44,7 +44,7 @@ export class ArenaScene extends Phaser.Scene {
     // верхняя панель пересобирается, чтобы цифры обновились
     this.children.list.filter((o) => (o as Phaser.GameObjects.Container).depth === 10).forEach((o) => o.destroy());
     renderTopBar(this, gameState);
-    renderBottomNav(this, 'ArenaScene', navForEpoch());
+    renderBottomNav(this, 'ArenaScene', navForStage());
   }
 
   private renderPhase(): void {

@@ -1,5 +1,5 @@
 import type { Encounter, CardDef, AnswerDef } from '../data/encounter';
-import type { EpochDef } from '../theme/epochs';
+import type { StageDef } from '../theme/stages';
 
 export type Confidence = 'low' | 'mid' | 'high' | null;
 
@@ -9,8 +9,8 @@ export type Confidence = 'low' | 'mid' | 'high' | null;
    В режимах stack/silent карты собираются в план (слоты).
    ===================================================================== */
 
-export function CardRail({ encounter, epoch, active, stack, onPick }: { encounter: Encounter; epoch: EpochDef; active: string | null; stack: string[]; onPick: (c: CardDef) => void }) {
-  const st = epoch.structure;
+export function CardRail({ encounter, stage, active, stack, onPick }: { encounter: Encounter; stage: StageDef; active: string | null; stack: string[]; onPick: (c: CardDef) => void }) {
+  const st = stage.structure;
   const isStack = st.stackSlots > 0;
   return (
     <div className="pt-3">
@@ -73,7 +73,7 @@ export function CardRail({ encounter, epoch, active, stack, onPick }: { encounte
 }
 
 /* =====================================================================
-   ВЕРДИКТ КОНФЛИКТА — что доминирует, до выбора действия (эпохи II+).
+   ВЕРДИКТ КОНФЛИКТА — что доминирует, до выбора действия (стадии II+).
    ===================================================================== */
 
 export function VerdictRow({ encounter, value, onPick }: { encounter: Encounter; value: 'A' | 'B' | null; onPick: (v: 'A' | 'B') => void }) {
@@ -103,9 +103,9 @@ export function VerdictRow({ encounter, value, onPick }: { encounter: Encounter;
    собранными уликами он поддержан. Одна колонка = одна иерархия.
    ===================================================================== */
 
-export function AnswerList({ encounter, epoch, selected, evidence, value, onPick, disabled }: { encounter: Encounter; epoch: EpochDef; selected: Set<string>; evidence: Set<string>; value: AnswerDef['id'] | null; onPick: (a: AnswerDef) => void; disabled?: boolean }) {
+export function AnswerList({ encounter, stage, selected, evidence, value, onPick, disabled }: { encounter: Encounter; stage: StageDef; selected: Set<string>; evidence: Set<string>; value: AnswerDef['id'] | null; onPick: (a: AnswerDef) => void; disabled?: boolean }) {
   void selected;
-  const showLinks = epoch.index <= 2;
+  const showLinks = stage.index <= 2;
   return (
     <div className="px-4 pt-3">
       <div className="mb-1.5 flex items-center justify-between text-[10px]" style={{ fontFamily: 'var(--font-mono)', color: 'var(--muted)' }}>

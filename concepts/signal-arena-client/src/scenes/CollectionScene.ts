@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { gameState } from '../state/GameState';
 import { cards } from '../data/cards';
 import { enemies, enemyById } from '../data/enemies';
-import { epochOf } from '../config/epochConfig';
+import { stageOf } from '../config/stageConfig';
 import { destroyFrom } from '../engine/shell';
 import { enemyAvatarKey, enemyRenderKey } from '../engine/assetKeys';
 
@@ -14,7 +14,7 @@ export class CollectionScene extends Phaser.Scene {
   constructor(){ super({ key:'CollectionScene'}); }
   create(): void {
     const p=gameState.progress;
-    const ep=epochOf(p.level);
+    const ep=stageOf(p.level);
     this.cameras.main.setBackgroundColor(ep.tokens.bg as any);
     this.add.text(14,14,'Коллекция', { fontFamily:'Inter, sans-serif', fontSize:'22px', color:'#E9F2FF'});
     this.add.text(14,40, `${cards.filter(c=> gameState.isCardUnlocked(c.id)).length} КАРТ · ${Object.keys(p.enemyStagesReached).length} ТРОФЕЕВ · КОМБО ${p.combosUnlocked.length}`, { fontFamily:'IBM Plex Mono, monospace', fontSize:'9px', color:'#62708A'});

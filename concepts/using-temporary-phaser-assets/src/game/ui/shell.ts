@@ -17,7 +17,7 @@ export const NAV_ITEMS = [
 ];
 
 export function currentPalette(): Palette {
-  return buildPalette(gameState.progress.epoch);
+  return buildPalette(gameState.progress.stage);
 }
 
 export function transitionTo(scene: Phaser.Scene, key: string, data?: object): void {
@@ -27,7 +27,7 @@ export function transitionTo(scene: Phaser.Scene, key: string, data?: object): v
 
 export function renderTopBar(scene: Phaser.Scene, gs: GameState): Phaser.GameObjects.Container {
   const p = gs.progress;
-  const pal = buildPalette(p.epoch);
+  const pal = buildPalette(p.stage);
   const c = scene.add.container(0, 0).setDepth(10);
   const h = CHROME.topBar;
 
@@ -116,7 +116,7 @@ export function bottomNavHeight(): number {
 }
 
 /** Все разделы открыты — это kit для проверки интерфейса. */
-export function navForEpoch(): string[] {
+export function navForStage(): string[] {
   return NAV_ITEMS.map((n) => n.key);
 }
 

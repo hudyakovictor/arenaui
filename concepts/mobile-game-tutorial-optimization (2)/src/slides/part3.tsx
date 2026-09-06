@@ -289,7 +289,7 @@ export function DoDSlide() {
             <ol className="mt-2 space-y-1 text-[13px] text-slate-300">
               <li>1. Prettier по всему phaser/src — код станет читаемым за 5 минут</li>
               <li>2. Найти все fontSize и поднять до шкалы</li>
-              <li>3. Удалить createDebugEpochSwitcher и дев-подписи</li>
+              <li>3. Удалить createDebugStageSwitcher и дев-подписи</li>
               <li>4. Вынести строки в ru.json</li>
               <li>5. Заменить Date.now() на seedrandom</li>
             </ol>

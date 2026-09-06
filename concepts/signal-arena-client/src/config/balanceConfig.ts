@@ -25,15 +25,15 @@ export const balanceConfig = {
   },
   // M1 Улика
   evidence: {
-    requiredInEpoch: { street: 1, cabinet: 1, terminal: 2, system: 2 } as const,
-    highlightInEpoch: { street: true, cabinet: false, terminal: false, system: false },
+    requiredInStage: { street: 1, cabinet: 1, terminal: 2, system: 2 } as const,
+    highlightInStage: { street: true, cabinet: false, terminal: false, system: false },
     needButton: { street: true, cabinet: false, terminal: false, system: false },
     partialRewardRatio: 0.35
   },
   // M2 Стек решений
   sequence: {
     introducedAt: 14,
-    slotsByEpoch: { street: 2, cabinet: 3, terminal: 4, system: 4 } as const,
+    slotsInStage: { street: 2, cabinet: 3, terminal: 4, system: 4 } as const,
     hasDecoyInSystem: true
   },
   // M3 Ставка уверенности
@@ -48,7 +48,7 @@ export const balanceConfig = {
   // M5 Опознание врага
   identify: {
     introducedAt: 8,
-    optionsByEpoch: { street: 2, cabinet: 4, terminal: 4, system: 0 } as const // 0 = по журналу
+    optionsInStage: { street: 2, cabinet: 4, terminal: 4, system: 0 } as const // 0 = по журналу
   },
   // M6 Проигрыш вперёд
   playForward: { durationMs: 3200, candleCount: 6 },
@@ -70,6 +70,6 @@ export const balanceConfig = {
   weather: { modes: ['TREND','FLAT','VOLATILE','NEWS','LATE_CYCLE'] as const },
   // M14 Тень арены
   shadow: { showFrom: 1 },
-  // уровни эпох
-  epochBorders: { street: [1,20], cabinet: [21,50], terminal: [51,80], system: [81,99] } as const
+  // уровни стадий
+  stageBorders: { street: [1,20], cabinet: [21,50], terminal: [51,80], system: [81,99] } as const
 };

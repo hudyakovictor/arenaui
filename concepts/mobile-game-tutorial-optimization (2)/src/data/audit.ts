@@ -23,7 +23,7 @@ export const evidence: Evidence[] = [
   },
   {
     file: 'phaser/src/scenes/ArenaScene.ts',
-    code: "createDebugEpochSwitcher() → 'LVL+8'",
+    code: "createDebugStageSwitcher() → 'LVL+8'",
     problem: 'Дев-кнопка «+8 уровней» видна каждому игроку прямо в главной сцене. Любой оценщик нажмёт её первой.',
     fix: 'import.meta.env.DEV && createDebugPanel() — и вынести в отдельный DebugPlugin.',
     impact: 'Качество кода, Визуал',
@@ -98,14 +98,14 @@ export const toneTable = [
   { before: 'UNKNOWN THREAT · Враг раскроется после решения · M5', after: 'Противник скрыт. Раскроется после решения' },
   { before: 'СНАЧАЛА УЛИКА (M1)', after: 'Сначала найди улику' },
   { before: 'M1: выбери улику в источнике, затем ответ — иначе неполная награда', after: 'Улика → ответ. Без улики награда меньше' },
-  { before: 'эпоха взрослеет без новых экранов — только состояния блоков (ТЗ Часть 3)', after: '— (удалить: это заметка для разработчика)' },
+  { before: 'стадия взрослеет без новых экранов — только состояния блоков (ТЗ Часть 3)', after: '— (удалить: это заметка для разработчика)' },
   { before: 'силуэт 5–8% rim', after: '— (удалить)' },
   { before: 'BUDGET = 0 · DRAWDOWN LEVIATHAN · СБЫТИЕ С БЮДЖЕТОМ', after: 'Бюджет исчерпан. Левиафан просадки' },
   { before: 'ЯРЛЫК: ПАМP БЕЗ ОБЪЁМА ★', after: 'Памп без объёма' },
 ];
 
 export const typeScale = [
-  { name: 'display', px: 32, use: 'Результат: ВЕРНО / НЕВЕРНО, смена эпохи' },
+  { name: 'display', px: 32, use: 'Результат: ВЕРНО / НЕВЕРНО, смена стадии' },
   { name: 'h1', px: 24, use: 'Вопрос задачи' },
   { name: 'h2', px: 20, use: 'Заголовки блоков, названия врагов' },
   { name: 'body', px: 16, use: 'Варианты ответов, уроки, объяснения' },
@@ -230,7 +230,7 @@ export const roadmap: Sprint[] = [
     to: 94,
     goals: [
       'Vitest: engine, scoring, детерминизм — покрытие 70 %',
-      'Playwright: первая задача, смена эпохи, навигация',
+      'Playwright: первая задача, смена стадии, навигация',
       'GitHub Actions: lint + typecheck + test + build + preview',
       'Атлас текстур, пулы объектов, Graphics вместо Rectangle',
       'Профилирование на бюджетном Android, 60 fps',

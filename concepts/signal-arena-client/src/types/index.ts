@@ -1,5 +1,5 @@
 export type SkillDomain = 'technical' | 'risk' | 'context' | 'crypto' | 'human' | 'cognitive';
-export type EpochId = 'street' | 'cabinet' | 'terminal' | 'system';
+export type StageId = 'street' | 'cabinet' | 'terminal' | 'system';
 export type SourceId = 'chart' | 'news' | 'position' | 'wallet' | 'tokenomics' | 'onchain' | 'orderbook' | 'sentiment';
 export type EvidenceId = string;
 
@@ -83,7 +83,7 @@ export interface GameProgress {
   riskBudget: number; // M15
   maxBudget: number;
   streak: number;
-  epoch: EpochId;
+  stage: StageId;
   cardRanks: Record<string, number>;
   enemyStagesReached: Record<string, number>;
   errorScroll: ErrorScrollEntry[];

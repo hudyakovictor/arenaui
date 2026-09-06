@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Signal Arena — Эпохи v2 · один источник токенов</title>
+<title>Signal Arena — Стадии v2 · один источник токенов</title>
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -13,7 +13,7 @@
   .panel{ background:#0d1119; border:1px solid var(--line); border-radius:14px; }
   .h{ font-family:Oswald,Inter,sans-serif; letter-spacing:.04em; text-transform:uppercase; }
 
-  /* ===== PHONE / ArenaScene (390x844) — всё от CSS-переменных эпохи ===== */
+  /* ===== PHONE / ArenaScene (390x844) — всё от CSS-переменных стадии ===== */
   .phone{
     width:390px; height:844px; flex:none; position:relative; overflow:hidden;
     background:var(--bg); color:var(--text); font-family:var(--font-ui);
@@ -112,12 +112,12 @@
 <header class="max-w-[1320px] mx-auto px-6 pt-8 pb-4 flex flex-wrap items-end justify-between gap-4">
   <div>
     <div class="mono text-[11px] tracking-[.2em] text-[#6f7a90]">SIGNAL ARENA · ARENASCENE · ЭПОХИ v2</div>
-    <h1 class="h text-3xl font-bold mt-1">Один скин · один скелет · эпоха меняет правила, не цвет</h1>
-    <p class="text-sm text-[#9aa3b5] mt-2 max-w-2xl">Прототип: палитра одна на всю игру (согласованная «Улица»). Эпоха — это набор правил: какие ярлыки видны, сколько улик нужно, какой стек карт, какие вкладки открыты. Раскладка вычисляется (nav прибит к низу, браузер получает остаток), механики привязаны к эпохе, а не к абсолютному уровню, Терминал — финал.</p>
+    <h1 class="h text-3xl font-bold mt-1">Один скин · один скелет · стадия меняет правила, не цвет</h1>
+    <p class="text-sm text-[#9aa3b5] mt-2 max-w-2xl">Прототип: палитра одна на всю игру (согласованная «Улица»). Стадия — это набор правил: какие ярлыки видны, сколько улик нужно, какой стек карт, какие вкладки открыты. Раскладка вычисляется (nav прибит к низу, браузер получает остаток), механики привязаны к стадийе, а не к абсолютному уровню, Терминал — финал.</p>
   </div>
   <div class="panel px-4 py-3 text-xs text-[#9aa3b5]">
     <div class="mono text-[10px] tracking-widest text-[#6f7a90] mb-1">ИСТОЧНИК ИСТИНЫ</div>
-    <div><span class="text-[#ff596d] line-through">4 палитры × 2 файла</span> → <span class="text-[#c8ff00]">1 палитра</span> + <span class="text-[#c8ff00]">epochs[id]</span> (правила)</div>
+    <div><span class="text-[#ff596d] line-through">4 палитры × 2 файла</span> → <span class="text-[#c8ff00]">1 палитра</span> + <span class="text-[#c8ff00]">stages[id]</span> (правила)</div>
   </div>
 </header>
 
@@ -178,7 +178,7 @@
       <div class="flex items-center justify-between gap-4">
         <div>
           <div class="mono text-[10px] tracking-widest text-[#6f7a90]">УРОВЕНЬ → ЭПОХА</div>
-          <div class="h text-2xl font-bold mt-1">L<span id="lvlBig">1</span> · <span id="epochBig">УЛИЦА</span></div>
+          <div class="h text-2xl font-bold mt-1">L<span id="lvlBig">1</span> · <span id="stageBig">УЛИЦА</span></div>
         </div>
         <div class="flex gap-2">
           <button id="prev" class="px-3 py-2 rounded-lg bg-[#161c29] hover:bg-[#1f2738] text-sm">−1</button>
@@ -203,7 +203,7 @@
         </div>
       </div>
       <div class="grid grid-cols-4 gap-3 mt-4" id="ranges"></div>
-      <p class="text-[11px] text-[#6f7a90] mt-3">Границы можно двигать — всё ниже (эпоха, токены, механики, оверлей) пересчитывается из одного массива. Именно так должен работать <span class="mono">getEpochForLevel()</span>: не четыре if-а, а таблица.</p>
+      <p class="text-[11px] text-[#6f7a90] mt-3">Границы можно двигать — всё ниже (стадия, токены, механики, оверлей) пересчитывается из одного массива. Именно так должен работать <span class="mono">getStageForLevel()</span>: не четыре if-а, а таблица.</p>
     </section>
 
     <div class="grid md:grid-cols-2 gap-5">
@@ -237,21 +237,21 @@
       <div class="grid md:grid-cols-3 gap-4 mt-3 text-[12px] leading-relaxed">
         <div class="bg-[#0a0e15] rounded-xl p-3 border border-[#1b2230]">
           <div class="text-[#ff596d] font-semibold mb-1">Было: 4 палитры в 2 файлах</div>
-          palette.ts (лайм <span class="mono">#c8ff00</span>) и epochConfig.ts (бирюза <span class="mono">#31D6C4</span>) расходились, плюс три недоделанных скина для II–IV.
+          palette.ts (лайм <span class="mono">#c8ff00</span>) и stageConfig.ts (бирюза <span class="mono">#31D6C4</span>) расходились, плюс три недоделанных скина для II–IV.
           <div class="text-[#3bde8a] font-semibold mt-2 mb-1">Стало</div>
-          Одна палитра на всю игру. <span class="mono">epochs[id]</span> хранит только правила: костыли, улики, стек, nav, motto. Перекрашивать нечего — ломаться нечему.
+          Одна палитра на всю игру. <span class="mono">stages[id]</span> хранит только правила: костыли, улики, стек, nav, motto. Перекрашивать нечего — ломаться нечему.
         </div>
         <div class="bg-[#0a0e15] rounded-xl p-3 border border-[#1b2230]">
           <div class="text-[#ff596d] font-semibold mb-1">Было: фиксированные Y</div>
           Блок вопроса без кирпича выше/ниже → всё едет, nav прибит к y=784, пустоты или наложение.
           <div class="text-[#3bde8a] font-semibold mt-2 mb-1">Стало</div>
-          Колонка: rail, вопрос, threat — фикс; браузер — остаток; strip, карты, ответы, nav — фикс снизу. Смена эпохи не ломает высоты.
+          Колонка: rail, вопрос, threat — фикс; браузер — остаток; strip, карты, ответы, nav — фикс снизу. Смена стадии не ломает высоты.
         </div>
         <div class="bg-[#0a0e15] rounded-xl p-3 border border-[#1b2230]">
-          <div class="text-[#ff596d] font-semibold mb-1">Было: эпоха = скин</div>
+          <div class="text-[#ff596d] font-semibold mb-1">Было: стадия = скин</div>
           Смена 20→21 незаметна и не учит; Терминал приходит на L51, когда игрок ещё не готов — и уходит на биржу.
           <div class="text-[#3bde8a] font-semibold mt-2 mb-1">Стало</div>
-          I–III растянуты, Терминал — финальные уровни. Каждая эпоха снимает костыль и открывает операцию; переход — через оверлей.
+          I–III растянуты, Терминал — финальные уровни. Каждая стадия снимает костыль и открывает операцию; переход — через оверлей.
         </div>
       </div>
     </section>
@@ -265,8 +265,8 @@ const TOKENS = { bg:'#0a0b0d', inset:'#0a0b0d', surface:'#16181d', elevated:'#1e
   paper:'#16181d', ink:'#f2f3f5', inkSub:'rgba(242,243,245,.55)', radius:16, texture:'brick',
   fontHead:'Oswald, Inter, sans-serif', fontUi:'Inter, system-ui, sans-serif', fontMono:"'IBM Plex Mono', monospace" };
 
-/* ============ ЕДИНЫЙ ИСТОЧНИК ИСТИНЫ: epochs[id] — цвета общие, различаются только правила ============ */
-const EPOCHS = {
+/* ============ ЕДИНЫЙ ИСТОЧНИК ИСТИНЫ: stages[id] — цвета общие, различаются только правила ============ */
+const STAGES = {
   street: { roman:'I', name:'УЛИЦА', tokens:TOKENS,
     motto:'ТЫ ЗДЕСЬ РАДИ ДЕНЕГ. ИМЕННО ПОЭТОМУ ТЫ УЖЕ В ОПАСНОСТИ.',
     crutches:{ labels:'all', evidenceHighlights:true, toActionButton:true },
@@ -294,12 +294,12 @@ const SHADE = { street:'#c8ff00', cabinet:'#a3d100', system:'#7fa300', terminal:
 /* Порядок + границы. Схема = массив, а не четыре if-а. */
 const SCHEMES = {
   old: { order:['street','cabinet','terminal','system'], ends:[20,50,80,99],
-         note:'Как в epochConfig.ts сейчас: Терминал уже на L51, Система — финал.' },
+         note:'Как в stageConfig.ts сейчас: Терминал уже на L51, Система — финал.' },
   new: { order:['street','cabinet','system','terminal'], ends:[30,60,85,99],
          note:'I–III растянуты, Терминал — последние уровни: к бирже приходит готовый игрок.' },
 };
 
-/* Механики: (эпоха, смещение от её начала). Уровень — производная. */
+/* Механики: (стадия, смещение от её начала). Уровень — производная. */
 const MECHS = [
   ['M1','Улики + evidence strip','street',0],['M6','График доигрывает','street',0],['M10','Вариант ЖДАТЬ в пуле','street',0],
   ['M11','Детерминированная мутация','street',0],['M12','Враг 3–4 стадии','street',0],['M13','Погода дня','street',0],
@@ -324,15 +324,15 @@ const QUESTIONS = {
 };
 
 /* ============ STATE ============ */
-const S = { level:1, scheme:'new', ends:[...SCHEMES.new.ends], selected:new Set(), lastEpoch:null, answered:null };
+const S = { level:1, scheme:'new', ends:[...SCHEMES.new.ends], selected:new Set(), nullStage:null, answered:null };
 
 function ranges(){
   const o = SCHEMES[S.scheme].order; let start=1;
   return o.map((id,i)=>{ const r={id,from:start,to:S.ends[i]}; start=S.ends[i]+1; return r; });
 }
-function getEpochForLevel(l){ return ranges().find(r=>l>=r.from && l<=r.to)?.id ?? 'street'; }
-function epochStart(id){ return ranges().find(r=>r.id===id)?.from ?? 1; }
-function mechLevel(m){ return epochStart(m[2]) + m[3]; }
+function getStageForLevel(l){ return ranges().find(r=>l>=r.from && l<=r.to)?.id ?? 'street'; }
+function stageStart(id){ return ranges().find(r=>r.id===id)?.from ?? 1; }
+function mechLevel(m){ return stageStart(m[2]) + m[3]; }
 
 /* ============ RENDER ============ */
 const $ = s=>document.querySelector(s);
@@ -351,7 +351,7 @@ function renderChart(){
   const rnd=seeded(S.level*7+3); let y=110, pts=[];
   for(let i=0;i<40;i++){ y+= (rnd()-0.5)*30 + (i>26? -3:1.2); y=Math.max(20,Math.min(180,y)); pts.push([i*370/39,y]); }
   const past=pts.slice(0,28).map(p=>p.join(',')).join(' '), fut=pts.slice(27).map(p=>p.join(',')).join(' ');
-  const ep=EPOCHS[getEpochForLevel(S.level)];
+  const ep=STAGES[getStageForLevel(S.level)];
   $('#chart').innerHTML = `
     <defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${ep.tokens.accent}" stop-opacity=".35"/><stop offset="1" stop-color="${ep.tokens.accent}" stop-opacity="0"/></linearGradient></defs>
     ${[40,80,120,160].map(g=>`<line x1="0" x2="370" y1="${g}" y2="${g}" stroke="${ep.tokens.border}" stroke-width="1"/>`).join('')}
@@ -362,7 +362,7 @@ function renderChart(){
 }
 
 function renderPhone(){
-  const id=getEpochForLevel(S.level), ep=EPOCHS[id], idx=SCHEMES[S.scheme].order.indexOf(id);
+  const id=getStageForLevel(S.level), ep=STAGES[id], idx=SCHEMES[S.scheme].order.indexOf(id);
   applyTokens(ep);
   $('#rLvl').textContent=S.level; $('#rXp').textContent=S.level*120; $('#rSig').textContent=1+Math.floor(S.level/9);
   $('#rWeather').textContent=['☁︎ ШУМ','☀︎ ЯСНО','⚡ ХАЙП','☂ FUD'][S.level%4];
@@ -408,27 +408,27 @@ function renderPhone(){
 
   renderChart();
 
-  // детектор смены эпохи → оверлей
-  if(S.lastEpoch && S.lastEpoch!==id){
+  // детектор смены стадии → оверлей
+  if(S.nullStage && S.nullStage!==id){
     $('#ovName').textContent=`${ep.roman} · ${ep.name}`; $('#ovMotto').textContent=ep.motto;
     $('#ovList').innerHTML=ep.learn.map(l=>`<li>· ${l}</li>`).join('');
     $('#overlay').classList.remove('hidden');
   }
-  S.lastEpoch=id;
+  S.nullStage=id;
 }
 
 function renderSide(){
-  const id=getEpochForLevel(S.level), ep=EPOCHS[id], rs=ranges();
-  $('#lvl').value=S.level; $('#lvlBig').textContent=S.level; $('#epochBig').textContent=`${ep.roman} ${ep.name}`;
+  const id=getStageForLevel(S.level), ep=STAGES[id], rs=ranges();
+  $('#lvl').value=S.level; $('#lvlBig').textContent=S.level; $('#stageBig').textContent=`${ep.roman} ${ep.name}`;
   $('#schemeNote').textContent=SCHEMES[S.scheme].note;
   document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.s===S.scheme));
 
-  $('#bar').innerHTML = rs.map(r=>`<div style="flex:${r.to-r.from+1};background:${SHADE[r.id]}">${EPOCHS[r.id].roman} ${r.from}–${r.to}</div>`).join('')
+  $('#bar').innerHTML = rs.map(r=>`<div style="flex:${r.to-r.from+1};background:${SHADE[r.id]}">${STAGES[r.id].roman} ${r.from}–${r.to}</div>`).join('')
     + `<span class="cursor" style="left:calc(${(S.level-1)/98*100}% - 1px)"></span>`;
 
   $('#ranges').innerHTML = rs.map((r,i)=>`
     <div class="bg-[#0a0e15] rounded-xl p-3 border border-[#1b2230]">
-      <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:${SHADE[r.id]}"></span><span class="text-xs font-semibold">${EPOCHS[r.id].roman} ${EPOCHS[r.id].name}</span></div>
+      <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:${SHADE[r.id]}"></span><span class="text-xs font-semibold">${STAGES[r.id].roman} ${STAGES[r.id].name}</span></div>
       <div class="flex items-center gap-2 mt-2 mono text-[11px] text-[#9aa3b5]">${r.from} → ${i<3?`<input class="num" type="number" min="${r.from}" max="${(S.ends[i+1]??99)-1}" value="${r.to}" data-i="${i}">`:'<span class="num inline-block">99</span>'}</div>
       <div class="text-[10px] text-[#6f7a90] mt-1">${r.to-r.from+1} уровней</div>
     </div>`).join('');
@@ -437,10 +437,10 @@ function renderSide(){
     S.ends[i]=Math.max(lo,Math.min(hi,v)); renderAll();
   });
 
-  $('#tokId').textContent=`общие для всех эпох`;
+  $('#tokId').textContent=`общие для всех стадий`;
   const t=ep.tokens;
   $('#tokens').innerHTML=['bg','surface','elevated','border','accent','good','bad','warn','text','sub','muted','paper'].map(k=>`<div class="tok"><span class="sw" style="background:${t[k]}"></span>${k} <span class="ml-auto text-[#6f7a90]">${t[k]}</span></div>`).join('');
-  $('#fonts').innerHTML=`<div>head: <span class="mono text-white">${t.fontHead.split(',')[0].replace(/'/g,'')}</span> · radius <span class="mono text-white">${t.radius}px</span> · texture <span class="mono text-white">${t.texture}</span></div><div class="text-[#6f7a90]">Один скин на всю игру. Эпоха не перекрашивает интерфейс — она меняет правила.</div>`;
+  $('#fonts').innerHTML=`<div>head: <span class="mono text-white">${t.fontHead.split(',')[0].replace(/'/g,'')}</span> · radius <span class="mono text-white">${t.radius}px</span> · texture <span class="mono text-white">${t.texture}</span></div><div class="text-[#6f7a90]">Один скин на всю игру. Стадия не перекрашивает интерфейс — она меняет правила.</div>`;
 
   const c=ep.crutches;
   const row=(k,v,on)=>`<div class="flex items-center justify-between bg-[#0a0e15] rounded-lg px-3 py-2 border border-[#1b2230]"><span class="text-[#9aa3b5]">${k}</span><span class="mono text-xs ${on?'text-[#3bde8a]':'text-[#ff596d]'}">${v}</span></div>`;
@@ -449,7 +449,7 @@ function renderSide(){
     + row('Стек карт', ep.stack, true) + row('Слепой источник', ep.blindSource?'да':'нет', !ep.blindSource) + row('Вкладки nav', ep.nav.length+'/5', true);
   $('#motto').textContent='« '+ep.motto+' »';
 
-  $('#mechs').innerHTML = MECHS.map(m=>{const L=mechLevel(m); const e=EPOCHS[m[2]];
+  $('#mechs').innerHTML = MECHS.map(m=>{const L=mechLevel(m); const e=STAGES[m[2]];
     return `<div class="mrow ${L<=S.level?'now':'future'}"><span class="mono text-[#c8ff00]">${m[0]}</span><span>${m[1]}</span><span class="mono text-[#9aa3b5]">L${L}${L<=S.level?' ✓':''}</span><span class="badge" style="background:${e.tokens.accent}">${e.roman} +${m[3]}</span></div>`;}).join('');
 }
 

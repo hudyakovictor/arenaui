@@ -284,11 +284,11 @@ export function CopySlide() {
 
 export function ArchitectureSlide() {
   const [mode, setMode] = useState<"before" | "after">("before");
-  const before = ["create()", "createTopBar", "createWeatherStrip", "createQuestion", "createThreat", "createBrowser", "renderSource ×5", "createEvidenceStrip", "refreshEvidenceStrip", "createSkills", "createAnswerBlock", "showConfidencePicker", "submitSequence", "submitAnswer", "handleResult", "showFeedback", "showIdentify", "showShadowAndReward", "showLeviathan", "showEpochTransition", "createBottomNav", "createDebugEpochSwitcher"];
+  const before = ["create()", "createTopBar", "createWeatherStrip", "createQuestion", "createThreat", "createBrowser", "renderSource ×5", "createEvidenceStrip", "refreshEvidenceStrip", "createSkills", "createAnswerBlock", "showConfidencePicker", "submitSequence", "submitAnswer", "handleResult", "showFeedback", "showIdentify", "showShadowAndReward", "showLeviathan", "showStageTransition", "createBottomNav", "createDebugStageSwitcher"];
   const after = {
     scene: ["ArenaScene (композиция, ~120 строк)"],
     ui: ["TopBar", "WeatherStrip", "QuestionCard", "ThreatBadge", "SourceBrowser", "CandleChart", "NewsFeed", "OrderBook", "EvidenceStrip", "CardHand", "AnswerGrid", "ConfidencePicker", "BottomNav"],
-    overlays: ["FeedbackOverlay", "IdentifyStep", "CrowdShadow", "RewardPanel", "LeviathanOverlay", "EpochTransition"],
+    overlays: ["FeedbackOverlay", "IdentifyStep", "CrowdShadow", "RewardPanel", "LeviathanOverlay", "StageTransition"],
     state: ["store/arena.ts (Zustand)", "store/progress.ts", "selectors.ts"],
     engine: ["scenario-gen", "scoring", "mutator", "rng (seedrandom)"],
     infra: ["api/client.ts", "motion.ts", "typography.ts", "i18n/ru.json"],
@@ -378,7 +378,7 @@ export function MotionSlide() {
     { what: "Счётчики XP / SIG / бюджет", now: "число меняется скачком", after: "tween числа 600 ms + всплывающий «+35»", pts: "+0.5" },
     { what: "Раскрытие врага (опознание)", now: "текст под кнопкой", after: "силуэт → портрет: маска rim-light 400 ms, лёгкий shake", pts: "+1" },
     { what: "Переход между сценами", now: "scene.start без перехода", after: "общий fade 180 ms, навигация остаётся на месте", pts: "+0.5" },
-    { what: "Смена эпохи", now: "оверлей с текстом", after: "палитра перетекает 800 ms, токены анимируются, без restart", pts: "+0.5" },
+    { what: "Смена стадии", now: "оверлей с текстом", after: "палитра перетекает 800 ms, токены анимируются, без restart", pts: "+0.5" },
     { what: "Ошибка / промах", now: "camera.flash красным", after: "shake 80 ms + haptic 30 ms + SFX; flash убрать (утомляет)", pts: "+1" },
   ];
   return (

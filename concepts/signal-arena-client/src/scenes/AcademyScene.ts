@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
 import { gameState } from '../state/GameState';
 import { cards } from '../data/cards';
-import { epochOf } from '../config/epochConfig';
-import { destroyFrom, navForEpoch } from '../engine/shell';
+import { stageOf } from '../config/stageConfig';
+import { destroyFrom, navForStage } from '../engine/shell';
 
 // Академия — теория, без врагов и без заданий Арены (ТЗ Часть 1 §4.3)
 // Единственное допустимое присутствие врага — тизер-силуэт на обложке главы
@@ -12,7 +12,7 @@ export class AcademyScene extends Phaser.Scene {
   constructor(){ super({ key:'AcademyScene'}); }
   create(): void {
     const p=gameState.progress;
-    const ep=epochOf(p.level);
+    const ep=stageOf(p.level);
     this.cameras.main.setBackgroundColor(ep.tokens.bg as any);
 
     this.add.text(14,14,'Академия', { fontFamily:'Inter, system-ui, sans-serif', fontSize:'22px', color:'#E9F2FF'});
@@ -118,7 +118,7 @@ export class AcademyScene extends Phaser.Scene {
   }
 
   private createBottomNav(){
-    const unlocked = navForEpoch(gameState.progress.level);
+    const unlocked = navForStage(gameState.progress.level);
     const items=[
       {label:'ACADEMY', active:true, key:'AcademyScene'},
       {label:'ARENA', active:false, key:'ArenaScene'},
@@ -129,7 +129,7 @@ export class AcademyScene extends Phaser.Scene {
       const isUnlocked = unlocked.includes(it.key);
       const nx=i*(390/4);
       this.add.rectangle(nx,784,390/4,60, COLORS.elevated).setStrokeStyle(1, COLORS.border).setOrigin(0).setInteractive().on('pointerdown', ()=>{
-        if(!isUnlocked){ this.cameras.main.flash(60,255,179,65); return; } // раздел откроется в следующей эпохе
+        if(!isUnlocked){ this.cameras.main.flash(60,255,179,65); return; } // раздел откроется в следующей стадийе
         if(!it.active) this.scene.start(it.key);
       });
       this.add.text(nx+390/8,814, it.label, { fontFamily:'IBM Plex Mono, monospace', fontSize:'8px', color: it.active?'#31D6C4': isUnlocked?'#62708A':'#46536A'}).setOrigin(0.5);

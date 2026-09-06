@@ -1,4 +1,4 @@
-import type { EpochDef } from '../theme/epochs';
+import type { StageDef } from '../theme/stages';
 
 export type SourceId = 'chart' | 'news' | 'position' | 'orderbook';
 
@@ -92,17 +92,17 @@ const BASE_NEWS: NewsItem[] = [
   { id: 'n3', title: 'Аналитик: «летим на луну, не проспите»', src: 'инфлюенсер', time: '11:40' },
 ];
 
-export function buildEncounter(epoch: EpochDef): Encounter {
-  const st = epoch.structure;
-  const candles = makeCandles(3 + epoch.index);
+export function buildEncounter(stage: StageDef): Encounter {
+  const st = stage.structure;
+  const candles = makeCandles(3 + stage.index);
 
   const evidence: EvidenceZone[] = [
     { id: 'ev-vol', source: 'chart', label: 'Рост цены при падающем объёме', short: 'Объём ↓ на росте', isCorrect: true, candle: 11 },
-    { id: 'ev-wick', source: 'chart', label: 'Длинная верхняя тень на пике', short: 'Тень на пике', isCorrect: epoch.index >= 3, candle: 12 },
+    { id: 'ev-wick', source: 'chart', label: 'Длинная верхняя тень на пике', short: 'Тень на пике', isCorrect: stage.index >= 3, candle: 12 },
     { id: 'ev-break', source: 'chart', label: 'Пробой уровня без ретеста', short: 'Пробой без ретеста', isCorrect: false, candle: 9 },
     { id: 'ev-vol-news', source: 'news', label: 'Официальные данные: спот-объём −35%', short: 'Спот −35% (биржа)', isCorrect: true },
     { id: 'ev-risk', source: 'position', label: 'Два входа без стопа в журнале', short: 'Входы без стопа', isCorrect: false },
-    { id: 'ev-thin', source: 'orderbook', label: 'Тонкий стакан, стен нет', short: 'Тонкий стакан', isCorrect: epoch.index >= 3 },
+    { id: 'ev-thin', source: 'orderbook', label: 'Тонкий стакан, стен нет', short: 'Тонкий стакан', isCorrect: stage.index >= 3 },
   ];
 
   const labelsFor = (): NewsItem[] =>
@@ -129,13 +129,13 @@ export function buildEncounter(epoch: EpochDef): Encounter {
   // слепая вкладка добавляется поверх лимита табов
   if (st.blindTab && sources.length < 4) sources.push(st.tabs >= 3 ? 'position' : 'orderbook');
 
-  const questionByEpoch: Record<number, string> = {
+  const questionByStage: Record<number, string> = {
     1: 'Цена растёт три свечи подряд. Входить сейчас?',
     2: 'Канал кричит о ките, цена растёт. Что делать?',
     3: 'Памп на тонком стакане при слабом объёме. План?',
     4: 'BTC +4% за час. Лента и стакан противоречат. Решение?',
   };
-  const hintByEpoch: Record<number, string> = {
+  const hintByStage: Record<number, string> = {
     1: 'Сначала найди улику на графике, потом выбирай ответ.',
     2: 'Сверь ленту с графиком: чему верить — данным или крику?',
     3: 'Нужно две улики из разных источников.',
@@ -143,12 +143,12 @@ export function buildEncounter(epoch: EpochDef): Encounter {
   };
 
   return {
-    id: `E${epoch.index}-0${epoch.index * 3}`,
+    id: `E${stage.index}-0${stage.index * 3}`,
     ticker: 'BTC/USDT',
-    timeframe: epoch.index >= 3 ? '15m' : '1h',
-    question: questionByEpoch[epoch.index],
-    hint: hintByEpoch[epoch.index],
-    weather: epoch.index === 1 ? 'Тренд' : epoch.index === 2 ? 'Новости' : epoch.index === 3 ? 'Волатильность' : 'Поздний цикл',
+    timeframe: stage.index >= 3 ? '15m' : '1h',
+    question: questionByStage[stage.index],
+    hint: hintByStage[stage.index],
+    weather: stage.index === 1 ? 'Тренд' : stage.index === 2 ? 'Новости' : stage.index === 3 ? 'Волатильность' : 'Поздний цикл',
     sources,
     candles,
     evidence,
@@ -161,7 +161,7 @@ export function buildEncounter(epoch: EpochDef): Encounter {
       { id: 'D', text: 'Купить половину, вторую — «если пойдёт»', supportedBy: ['ev-break', 'ev-risk'] },
     ],
     correct: 'B',
-    enemy: { id: 'E05', name: 'FOMO-Шептун', domain: 'cognitive', stage: Math.min(epoch.index, 3) },
+    enemy: { id: 'E05', name: 'FOMO-Шептун', domain: 'cognitive', stage: Math.min(stage.index, 3) },
     verdict: st.verdict ? { a: 'Сила движения', b: 'Слабость объёма', correct: 'B' } : undefined,
     stackOrder: ['c-source', 'c-volume', 'c-wait', 'c-stop'].slice(0, Math.max(st.stackSlots, 0)),
   };

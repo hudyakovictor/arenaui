@@ -1,9 +1,9 @@
 // Минимальное состояние прогресса (совместимо по полям с phaser/src/state/GameState.ts).
-import type { EpochId } from '../ui/palette';
+import type { StageId } from '../ui/palette';
 
 export interface Progress {
   level: number;
-  epoch: EpochId;
+  stage: StageId;
   xp: number;
   xpMax: number;
   coins: number;
@@ -20,7 +20,7 @@ const KEY = 'signal-arena-kit-v1';
 
 function defaults(): Progress {
   return {
-    level: 1, epoch: 'street', xp: 0, xpMax: 100, coins: 40,
+    level: 1, stage: 'street', xp: 0, xpMax: 100, coins: 40,
     riskBudget: 100, maxBudget: 100, streak: 0,
     enemyStagesReached: {}, defeated: [], cardsOwned: [],
   };
@@ -49,7 +49,7 @@ class GameStateStore {
   getFlag(k: string): boolean { return !!this.flags[k]; }
   setFlag(k: string, v = true): void { this.flags[k] = v; this.save(); }
 
-  setEpoch(e: EpochId): void { this.progress.epoch = e; this.save(); }
+  setStage(e: StageId): void { this.progress.stage = e; this.save(); }
 
   meet(enemyId: string): void {
     const cur = this.progress.enemyStagesReached[enemyId] ?? 0;

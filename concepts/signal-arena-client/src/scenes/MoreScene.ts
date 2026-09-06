@@ -1,17 +1,17 @@
 import Phaser from 'phaser';
 import { gameState } from '../state/GameState';
-import { epochOf } from '../config/epochConfig';
-import { renderTopBar, renderBottomNav, navForEpoch, destroyFrom } from '../engine/shell';
+import { stageOf } from '../config/stageConfig';
+import { renderTopBar, renderBottomNav, navForStage, destroyFrom } from '../engine/shell';
 
 const W = 390, H = 844;
 const S = { bg:0x070B14, surface:0x0C1323, elevated:0x111B2E, border:0x22304A, cyan:0x31D6C4, muted:0x62708A, sub:0x93A3BC, text:0xE9F2FF };
 
-// «Ещё» — профиль + сервисные разделы (растут с эпохой, ТЗ Часть 2 §2)
+// «Ещё» — профиль + сервисные разделы (растут с стадийой, ТЗ Часть 2 §2)
 export class MoreScene extends Phaser.Scene {
   constructor(){ super({ key:'MoreScene' }); }
   create(){
     const p = gameState.progress;
-    const ep = epochOf(p.level);
+    const ep = stageOf(p.level);
     this.cameras.main.setBackgroundColor(ep.tokens.bg as any);
     renderTopBar(this, gameState);
     this.add.text(14, 68, 'ЕЩЁ', { fontFamily:'Inter, system-ui, sans-serif', fontSize:'22px', color:'#E9F2FF' });
@@ -43,12 +43,12 @@ export class MoreScene extends Phaser.Scene {
       this.add.text(352, y+29,'›', { fontFamily:'Inter, sans-serif', fontSize:'16px', color:'#62708A' }).setOrigin(0.5);
     });
 
-    renderBottomNav(this, 'MoreScene', navForEpoch(p.level));
+    renderBottomNav(this, 'MoreScene', navForStage(p.level));
   }
   private openSheet(kind:string){
     if(kind!=='profile') return;
     const p = gameState.progress;
-    const ep = epochOf(p.level);
+    const ep = stageOf(p.level);
     const sheet = this.add.rectangle(0,0,W,H, 0x070B14, 0.95).setOrigin(0).setInteractive();
     this.add.text(195, 220, 'ПРОФИЛЬ', { fontFamily:'Inter, sans-serif', fontSize:'18px', color:'#E9F2FF' }).setOrigin(0.5);
     const cal = p.calibration.slice(-10);
@@ -60,7 +60,7 @@ export class MoreScene extends Phaser.Scene {
       `XP ${p.xp}/${p.xpMax} · SIG ${p.coins} · бюджет ${p.riskBudget}/${p.maxBudget}`,
       `стрик ×${p.streak} · свиток: ${p.errorScroll.filter(e=>!e.closed).length} открытых`,
       `карт открыто: ${Object.keys(p.cardRanks).filter(k=>(p.cardRanks[k]??0)>0).length}/17 · трофеев: ${Object.keys(p.enemyStagesReached).length}/33`,
-      `комбо: ${p.combosUnlocked.length} · эпоха: ${ep.id}`,
+      `комбо: ${p.combosUnlocked.length} · стадия: ${ep.id}`,
       calLine,
     ];
     rows.forEach((r,i)=> this.add.text(40, 270+i*30, r, { fontFamily:'IBM Plex Mono, monospace', fontSize:'9px', color:'#93A3BC' }));
