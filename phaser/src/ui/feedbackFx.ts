@@ -2,7 +2,7 @@
 // Звуки синтезируются через WebAudio: не тянем бинарные ассеты в бандл,
 // но интерфейс перестаёт быть немым. Всё выключается в настройках.
 
-type SfxName = 'tap' | 'correct' | 'wrong' | 'reward' | 'epoch';
+type SfxName = 'tap' | 'correct' | 'wrong' | 'reward';
 
 interface Prefs {
   sound: boolean;
@@ -70,11 +70,7 @@ const VOICES: Record<SfxName, Tone[]> = {
     { freq: 523, dur: 0.08, type: 'triangle', gain: 0.06 },
     { freq: 659, dur: 0.08, type: 'triangle', gain: 0.06 },
     { freq: 784, dur: 0.16, type: 'triangle', gain: 0.06 },
-  ],
-  epoch: [
-    { freq: 196, dur: 0.3, type: 'sine', gain: 0.06, slideTo: 392 },
-    { freq: 392, dur: 0.35, type: 'sine', gain: 0.05 },
-  ],
+   ],
 };
 
 /** Проигрывает короткий синтезированный звук. */

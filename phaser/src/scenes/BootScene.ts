@@ -3,7 +3,7 @@
 // Всё игровое содержимое — в идеях (docs/specs/CONCEPT_IDEAS.md).
 
 import Phaser from 'phaser';
-import { buildPalette } from '../ui/palette';
+import { PALETTE } from '../ui/palette';
 import { CANVAS, GUTTER, SP } from '../ui/tokens';
 import * as TX from '../ui/text';
 import { progressBar } from '../ui/widgets';
@@ -18,7 +18,7 @@ export class BootScene extends Phaser.Scene {
   }
 
   preload(): void {
-    const p = buildPalette('street');
+    const p = PALETTE;
     const w = CANVAS.w - GUTTER * 2;
     const barY = CANVAS.h / 2 + 60;
     progressBar(this, GUTTER, barY, w, 6, 0, p.accentN, p);
@@ -34,7 +34,7 @@ export class BootScene extends Phaser.Scene {
   create(): void {
     initFx();
     initMotion();
-    const p = buildPalette('street');
+    const p = PALETTE;
     this.cameras.main.setBackgroundColor(p.bgN);
     if (this.textures.exists('bg-wall')) {
       this.add.image(0, 0, 'bg-wall').setOrigin(0).setDisplaySize(CANVAS.w, CANVAS.h).setAlpha(0.5);

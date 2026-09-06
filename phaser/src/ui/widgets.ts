@@ -45,7 +45,7 @@ export function tappable(
   });
 }
 
-/** Панель со скруглением и рамкой в токенах эпохи. */
+/** Панель со скруглением и рамкой. */
 export function panel(
   scene: Phaser.Scene,
   x: number,
